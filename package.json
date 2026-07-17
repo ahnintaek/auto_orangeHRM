@@ -1,0 +1,31 @@
+{
+  "name": "orangehrm",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "code": "playwright codegen https://opensource-demo.orangehrmlive.com/web/index.php/",
+    "hrm_admin": "playwright test HRM_admin.spec.ts",
+    "hrm_pim": "playwright test HRM_pim.spec.ts"
+  },
+  "pkg": {
+    "scripts": [
+      "dist/**/*.js"
+    ],
+    "assets": [
+      "node_modules/inquirer/**/*",
+      "node_modules/@inquirer/**/*",
+      "node_modules/tslib/**/*"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.1"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
