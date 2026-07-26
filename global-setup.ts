@@ -1,6 +1,6 @@
 import { chromium } from '@playwright/test';
 import 'dotenv/config';
-import { selectDropdown, waitForFormReady } from './project/utils/formHelpers';
+import { selectDropdown, waitForFormReady, goToNextInstallerStep } from './project/utils/formHelpers';
 
 async function globalSetup() {
     const browser = await chromium.launch({
@@ -39,7 +39,7 @@ async function globalSetup() {
 
   // 4) 라이선스 동의
   await page.getByText('I accept the terms in the').click();
-  await page.getByRole('button', { name: 'Next' }).click();
+  await goToNextInstallerStep(page);
 
   // 5) Database Configuration
   await page.getByText('Existing Empty Database').click();
@@ -47,33 +47,38 @@ async function globalSetup() {
   await page.getByRole('textbox').nth(2).fill('orangehrm');               // DB Name
   await page.getByRole('textbox').nth(3).fill('orangehrm');               // DB Username
   await page.locator('input[type="password"]').fill('orangehrm');        // DB Password
-  await page.getByRole('button', { name: 'Next' }).click();
+  await goToNextInstallerStep(page);
 
   // 6) 데이터 암호화 확인 화면
-  await page.getByRole('button', { name: 'Next' }).click();
+  await goToNextInstallerStep(page);
 
   // 7) Organization 정보
   await page.getByRole('textbox').fill('orangehrm');   // Organization Name (라벨 중복 없어서 그대로 둬도 무방, 여유되면 getFieldInput으로 교체 가능)
   await selectDropdown(page, 'Country', 'Korea, Republic of');
   await selectDropdown(page, 'Language', 'English (United States)');
   await selectDropdown(page, 'Timezone', 'Asia/Seoul');
-  await page.getByRole('button', { name: 'Next' }).click();
+  await goToNextInstallerStep(page);
   await waitForFormReady(page);
 
   // 8) 관리자 계정 생성 - 민감 정보는 env로 분리
-  await page.getByPlaceholder('First Name').fill(process.env.ADMIN_FIRST_NAME || 'ahn');
+  try {
+    await page.getByPlaceholder('First Name').fill(process.env.ADMIN_FIRST_NAME || 'ahn');
+  } catch (e) {
+    await page.screenshot({ path: 'installer-failure.png', fullPage: true });
+    throw e;
+  }
   await page.getByPlaceholder('Last Name').fill(process.env.ADMIN_LAST_NAME || 'intaek');
   await page.getByRole('textbox').nth(2).fill(process.env.ADMIN_EMAIL!);
   await page.getByRole('textbox').nth(4).fill(process.env.ADMIN_ID!);
   await page.getByRole('textbox').nth(5).fill(process.env.ADMIN_PW!);
   await page.locator('input[type="password"]').nth(1).fill(process.env.ADMIN_PW!);
-  await page.getByRole('button', { name: 'Next' }).click();
+  await goToNextInstallerStep(page);
 
   // 9) 설치 실행 - 여기서 실제 DB 마이그레이션이 진행되므로 넉넉한 타임아웃 필요
   console.log('[global-setup] DB 마이그레이션 시작 - 시간이 걸릴 수 있습니다');
   await page.getByRole('button', { name: 'Install' }).click();
   await page.getByRole('button', { name: 'Next' }).waitFor({ timeout: 300_000 }); // 최대 2분 대기
-  await page.getByRole('button', { name: 'Next' }).click();
+  await goToNextInstallerStep(page);
 
   // 10) 설치 완료
   await page.getByRole('button', { name: 'Launch OrangeHRM' }).click();

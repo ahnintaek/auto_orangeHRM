@@ -17,3 +17,8 @@ export async function waitForFormReady(page: Page) {
     await loader.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
     await loader.waitFor({ state: 'hidden', timeout: 10000 });
   }
+
+  export async function goToNextInstallerStep(page: Page) {
+    await page.getByRole('button', { name: 'Next' }).click();
+    await page.waitForLoadState('networkidle');   // 진행 중인 네트워크 요청이 잠잠해질 때까지 대기
+  }
