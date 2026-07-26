@@ -41,6 +41,9 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test
+        env:
+          ADMIN_ID: ${{ secrets.ADMIN_ID }}
+          ADMIN_PW: ${{ secrets.ADMIN_PW }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

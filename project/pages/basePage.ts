@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 import { expect, Locator } from '@playwright/test';
+import { getInputGroup, selectDropdown } from '../utils/formHelpers';
 
 export class BasePage {
   constructor(protected readonly page: Page) {}
@@ -27,26 +28,19 @@ export class BasePage {
   }
 
   protected getInputGroup(label: string | RegExp) {
-    return this.page
-      .locator('.oxd-input-group')
-      .filter({
-        has: this.page.getByText(label, { exact: true }),
-      });
+    return getInputGroup(this.page, label);
   }
-  
+
   protected getFieldInput(label: string | RegExp) {
     return this.getInputGroup(label).locator('input');
   }
-  
+
   protected getDateInput(label: string | RegExp) {
     return this.getInputGroup(label).locator('.oxd-date-input input');
   }
-  
+
   protected async selectDropdown(label: string | RegExp, value: string) {
-    const group = this.getInputGroup(label);
-  
-    await group.locator('.oxd-select-text').click();
-    await this.page.getByRole('option', { name: value, exact: true }).click();
+    await selectDropdown(this.page, label, value);
   }
 
   protected getForm() {

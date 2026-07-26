@@ -7,6 +7,7 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 const ENV = process.env.TEST_ENV
 
 export default defineConfig({
+  globalSetup: require.resolve('./global-setup.ts'),
   testDir: './project/tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
