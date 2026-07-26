@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "code": "playwright codegen https://opensource-demo.orangehrmlive.com/web/index.php/",
-    "hrm_admin": "playwright test HRM_admin.spec.ts",
-    "hrm_pim": "playwright test HRM_pim.spec.ts"
+    "code": "playwright codegen http://localhost:8080",
+    "hrm": "playwright test",
+    "hrm_admin": "playwright test admin.spec.ts",
+    "hrm_pim": "playwright test pim.spec.ts"
   },
   "pkg": {
     "scripts": [
