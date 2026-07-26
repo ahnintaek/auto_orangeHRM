@@ -1,6 +1,6 @@
 import { chromium } from '@playwright/test';
 import 'dotenv/config';
-import { selectDropdown } from './project/utils/formHelpers';
+import { selectDropdown, waitForFormReady } from './project/utils/formHelpers';
 
 async function globalSetup() {
     const browser = await chromium.launch({
@@ -58,6 +58,7 @@ async function globalSetup() {
   await selectDropdown(page, 'Language', 'English (United States)');
   await selectDropdown(page, 'Timezone', 'Asia/Seoul');
   await page.getByRole('button', { name: 'Next' }).click();
+  await waitForFormReady(page);
 
   // 8) 관리자 계정 생성 - 민감 정보는 env로 분리
   await page.getByPlaceholder('First Name').fill(process.env.ADMIN_FIRST_NAME || 'ahn');

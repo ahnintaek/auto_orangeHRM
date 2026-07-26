@@ -11,3 +11,9 @@ export async function selectDropdown(page: Page, label: string | RegExp, value: 
   await group.locator('.oxd-select-text').click();
   await page.getByRole('option', { name: value, exact: true }).click();
 }
+
+export async function waitForFormReady(page: Page) {
+    const loader = page.locator('.oxd-form-loader');
+    await loader.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
+    await loader.waitFor({ state: 'hidden', timeout: 10000 });
+  }
