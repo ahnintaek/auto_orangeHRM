@@ -3,8 +3,11 @@ import 'dotenv/config';
 import { selectDropdown } from './project/utils/formHelpers';
 
 async function globalSetup() {
-  const browser = await chromium.launch({ headless: false, slowMo: 300 });
-  const page = await browser.newPage();
+    const browser = await chromium.launch({
+        headless: !!process.env.CI,
+        slowMo: process.env.CI ? 0 : 300,
+      });
+      const page = await browser.newPage();
 
   // 1) 컨테이너가 완전히 응답할 때까지 재시도
   let ready = false;
