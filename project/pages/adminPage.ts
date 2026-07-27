@@ -5,6 +5,7 @@ export class AdminPage extends BasePage {
 
   async goto() {
     await this.page.getByRole('link', { name: 'Admin' }).click();
+    await this.waitForPageLoad();
   }
 
   async openAddUserForm() {
@@ -48,6 +49,7 @@ export class AdminPage extends BasePage {
   }
 
   async deleteEmployee() {
+    await this.waitForPageLoad();
     await this.page.locator('.oxd-icon.bi-check').first().click();
     await this.page.getByRole('button', { name: 'Delete Selected' }).click();
     await this.page.getByRole('button', { name: 'Yes, Delete' }).click();

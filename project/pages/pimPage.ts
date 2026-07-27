@@ -42,6 +42,7 @@ interface ContactDetails {
 export class PimPage extends BasePage {
   async goto() {
     await this.page.getByRole('link', { name: 'PIM' }).click();
+    await this.waitForPageLoad();
   }
 
   async openAddEmployeeForm() {
@@ -137,10 +138,12 @@ export class PimPage extends BasePage {
   }
 
   async searchEmployee(employeeNum:string) {
+    await this.waitForPageLoad();
     await this.getFieldInput(/^Employee Id$/).fill(employeeNum)
   }
 
   async deleteEmployee(employeeNum: string) {
+    await this.waitForPageLoad();
     const row = this.page.locator('.oxd-table-row').filter({
       has: this.page.locator(`div:text-is("${employeeNum}")`)
     });
