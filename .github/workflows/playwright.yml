@@ -47,13 +47,22 @@ jobs:
           ADMIN_PW: ${{ secrets.ADMIN_PW }}
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
 
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+      # - uses: actions/upload-artifact@v4
+      #   if: ${{ !cancelled() }}
+      #   with:
+      #     name: playwright-report
+      #     path: |
+      #       playwright-report/
+      #       test-results/
+      #     retention-days: 30
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: 
+          name: playwright-artifacts
+          path: |
             playwright-report/
-            installer-failure.png
+            test-results/
           retention-days: 30
 
       - name: Stop containers
