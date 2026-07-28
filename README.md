@@ -8,7 +8,7 @@
 - 초기엔 공개 데모(opensource-demo.orangehrmlive.com)를 사용했으나, 다른 사용자에 의해 UI 언어가 예고 없이 변경되는 등 공유 환경의 불안정성을 겪은 뒤, Docker로 격리된 자체 환경으로 전환
 
 ## 아키텍처
-
+```
 project/
 ├── models/employee.ts
 ├── pages/
@@ -24,7 +24,7 @@ project/
     └── pim.spec.ts
 global-setup.ts               # 테스트 실행 전 OrangeHRM 설치 마법사를 자동 완료
 docker-compose.yml
-
+```
 Page Object Model을 택한 이유: UI 변경 시 로케이터 수정 지점을 페이지 클래스 한 곳으로 집중시켜 유지보수 비용을 낮추기 위함. 라벨 텍스트 기반 셀렉터(`getInputGroup`)로 통일하여, 필드 순서가 바뀌어도 테스트가 깨지지 않도록 설계.
 
 ## 테스트 전략 (현재 2개 시나리오)
