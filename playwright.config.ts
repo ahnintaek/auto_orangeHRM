@@ -52,7 +52,7 @@ export default defineConfig({
       name: 'chromium',
       use: {
         browserName: 'chromium',
-        viewport: null,
+        viewport: process.env.CI ? { width: 1920, height: 1080 } : null,
         launchOptions: {
           headless: !!process.env.CI,              // CI에서는 true, 로컬에서는 false
           args: process.env.CI ? [] : ['--start-maximized'],
