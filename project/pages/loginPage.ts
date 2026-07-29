@@ -17,4 +17,13 @@ export class LoginPage {
     await this.goto();
     await this.login(process.env.ADMIN_ID!, process.env.ADMIN_PW!);
   }
+
+  async getRequiredErrorCount(): Promise<number> {
+    return this.page.getByText('Required', { exact: true }).count();
+  }
+
+  async getInvalidCredentialsError() {
+    return this.page.locator('.oxd-alert-content-text');
+  }
+
 }
