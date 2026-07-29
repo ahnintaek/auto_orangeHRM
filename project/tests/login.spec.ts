@@ -12,8 +12,8 @@ const loginCases: LoginCase[] = [
   { description: '아이디/비밀번호 모두 빈 값', username: '', password: '', expectedError: 'required' },
   { description: '아이디만 빈 값', username: '', password: 'admin123', expectedError: 'required' },
   { description: '비밀번호만 빈 값', username: 'Admin', password: '', expectedError: 'required' },
-  { description: '잘못된 비밀번호', username: 'Admin', password: 'wrongpassword123', expectedError: 'invalid' },
-  { description: '존재하지 않는 아이디', username: 'no_such_user_xyz', password: 'admin123', expectedError: 'invalid' },
+  { description: '잘못된 비밀번호', username: 'Admin', password: 'error123', expectedError: 'invalid' },
+  { description: '존재하지 않는 아이디', username: 'no_Admin', password: 'admin123', expectedError: 'invalid' },
 ];
 
 test.describe('로그인 실패 검증', () => {
@@ -25,8 +25,8 @@ test.describe('로그인 실패 검증', () => {
 
       if (c.expectedError === 'required') {
         // 클라이언트 사이드 검증: 페이지 이동 없이 즉시 노출
-        const requiredCount = await loginPage.getRequiredErrorCount();
-        expect(requiredCount).toBeGreaterThan(0);
+        const requiredErrors = await loginPage.getRequiredErrorLocator();
+        await expect(requiredErrors.first()).toBeVisible({ timeout: 5000 });
       } else {
         // 서버 응답 기반 검증: 요청 후 alert 노출까지 자동 대기
         await expect(await loginPage.getInvalidCredentialsError()).toBeVisible({ timeout: 10000 });

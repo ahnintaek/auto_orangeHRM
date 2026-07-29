@@ -5,7 +5,7 @@ import { LoginPage } from '../pages/loginPage';
 import { PimPage } from '../pages/pimPage';
 import { EmployeeInfo } from "../models/employee";
 
-test('신규 직원을 등록하고 개인정보/연락처를 저장한다', async ({ page }) => {
+test('신규 직원을 등록하고 검색 후 삭제한다', async ({ page }) => {
   const loginPage = new LoginPage(page);
   const pimPage = new PimPage(page);
 
