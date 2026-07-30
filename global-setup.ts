@@ -1,6 +1,8 @@
 import { chromium } from '@playwright/test';
 import 'dotenv/config';
 import { selectDropdown, waitForFormReady, goToNextInstallerStep } from './project/utils/formHelpers';
+import { JobSettingsPage } from './project/pages/jobSettingsPage';
+import { LoginPage } from './project/pages/loginPage';
 
 async function globalSetup() {
     const browser = await chromium.launch({
@@ -85,7 +87,49 @@ async function globalSetup() {
   await page.waitForURL('**/auth/login', { timeout: 30_000 });
 
   console.log('[global-setup] 설치 완료');
-  await browser.close();
-}
+
+  const loginPage = new LoginPage(page);
+  const jobSettingsPage = new JobSettingsPage(page);
+
+  await loginPage.goto();
+  await loginPage.login(process.env.ADMIN_ID!, process.env.ADMIN_PW!);
+  await jobSettingsPage.goto();
+
+  // 1) Job Title 시딩 (기존)
+  const jobName = 'QA Engineer';
+  await jobSettingsPage.gotoJobTitles();
+
+  const jobExists = await page.locator('.oxd-table-row')
+    .filter({ has: page.locator(`div:text-is("${jobName}")`) })
+    .count() > 0;
+
+  if (!jobExists) {
+    console.log('Job Title 시드 데이터 생성');
+    await jobSettingsPage.addJobDetails({
+      jobName: jobName,
+      jobDescription: 'Job Title Description for QA Engineer',
+      jobNote: 'Job Title Note for QA Engineer',
+    });
+  } else {
+    console.log('Job Title 시드 데이터 이미 존재 - 건너뜀');
+  }
+
+  // 2) Job Category 시딩 (신규 추가) - 같은 멱등성 패턴 재사용
+  const categoryName = 'Engineering';
+  await jobSettingsPage.gotoJobCategories();
+
+  const categoryExists = await page.locator('.oxd-table-row')
+    .filter({ has: page.locator(`div:text-is("${categoryName}")`) })
+    .count() > 0;
+
+  if (!categoryExists) {
+    console.log('Job Category 시드 데이터 생성');
+    await jobSettingsPage.addJobCategory(categoryName);
+  } else {
+    console.log('Job Category 시드 데이터 이미 존재 - 건너뜀');
+  }
+
+    await browser.close();
+  }
 
 export default globalSetup;
