@@ -47,6 +47,15 @@ export class BasePage {
     return this.page.locator('form');
   }
 
+  protected async gotoModule(moduleName: string) {
+    await this.page.getByRole('link', { name: moduleName }).click();
+    await this.waitForPageLoad();
+  }
+
+  protected async addBtn() {
+    await this.page.getByRole('button', { name: 'Add' }).click();
+  }
+
   async save() {
     await this.getForm()
       .getByRole('button', { name: 'Save', exact: true })
