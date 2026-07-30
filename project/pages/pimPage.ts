@@ -143,15 +143,16 @@ export class PimPage extends BasePage {
   }
 
   async goToJobDetails(employeeNum: string) {
-    const jobDetailsResponse = this.page.waitForResponse(
-      resp => resp.url().includes('jobDetails') && resp.status() === 200
-    );
     const row = this.page.locator('.oxd-table-row').filter({
       has: this.page.locator(`div:text-is("${employeeNum}")`),
     });
     await expect(row).toHaveCount(1);
     await row.locator('button:has(.bi-pencil-fill)').click();
-  
+    await this.waitForPageLoad();
+    
+    const jobDetailsResponse = this.page.waitForResponse(
+      resp => resp.url().includes('jobDetails') && resp.status() === 200
+    );
     await this.page.getByRole('link', { name: 'Job' }).click();
     await jobDetailsResponse;
     await this.waitForPageLoad();
@@ -160,9 +161,10 @@ export class PimPage extends BasePage {
 
   async fillJobDetails(details: JobDetails) {
     await this.fillAndVerify(this.getDateInput("Joined Date"), details.joinedDate);
-    await this.fillAndVerify(this.getDateInput("Job Title"), details.jobTitle);
-    await this.fillAndVerify(this.getDateInput("Job Category"), details.jobCategory);
-    await this.addBtn();
+    await this.selectDropdown("Job Title", details.jobTitle);
+    await this.selectDropdown("Job Category", details.jobCategory);
+    await this.page.getByRole('button', { name: 'Save' }).click();
+  await this.waitForPageLoad();
   }
 
   async searchEmployee(employeeNum:string) {
