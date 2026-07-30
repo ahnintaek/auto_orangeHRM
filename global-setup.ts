@@ -3,6 +3,8 @@ import 'dotenv/config';
 import { selectDropdown, waitForFormReady, goToNextInstallerStep } from './project/utils/formHelpers';
 import { JobSettingsPage } from './project/pages/jobSettingsPage';
 import { LoginPage } from './project/pages/loginPage';
+import { SEED_JOB_TITLE, SEED_JOB_CATEGORY } from './project/testData/seedData';
+
 
 async function globalSetup() {
     const browser = await chromium.launch({
@@ -97,7 +99,7 @@ async function globalSetup() {
   await jobSettingsPage.goto();
 
   // 1) Job Title 시딩 (기존)
-  const jobName = 'QA Engineer';
+  const jobName = SEED_JOB_TITLE;
   await jobSettingsPage.gotoJobTitles();
 
   const jobExists = await page.locator('.oxd-table-row')
@@ -108,15 +110,15 @@ async function globalSetup() {
     console.log('Job Title 시드 데이터 생성');
     await jobSettingsPage.addJobDetails({
       jobName: jobName,
-      jobDescription: 'Job Title Description for QA Engineer',
-      jobNote: 'Job Title Note for QA Engineer',
+      jobDescription: `Job Title Description for ${jobName}`,
+      jobNote: `Job Title Note for ${jobName}`,
     });
   } else {
     console.log('Job Title 시드 데이터 이미 존재 - 건너뜀');
   }
 
   // 2) Job Category 시딩 (신규 추가) - 같은 멱등성 패턴 재사용
-  const categoryName = 'Engineering';
+  const categoryName = SEED_JOB_CATEGORY;
   await jobSettingsPage.gotoJobCategories();
 
   const categoryExists = await page.locator('.oxd-table-row')

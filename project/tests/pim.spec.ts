@@ -1,15 +1,15 @@
 import { test, expect } from '@playwright/test';
-import path from 'path';
 import 'dotenv/config';
 import { LoginPage } from '../pages/loginPage';
 import { PimPage } from '../pages/pimPage';
 import { EmployeeInfo } from "../models/employee";
+import { PROFILE_IMAGE_PATH } from '../testData/filePaths';
+import { SEED_JOB_TITLE, SEED_JOB_CATEGORY } from '../testData/seedData';
 
 test('신규 직원을 등록하고 검색 후 삭제한다', async ({ page }) => {
   const loginPage = new LoginPage(page);
   const pimPage = new PimPage(page);
 
-  const uploadFilePath = path.join(__dirname, '..', '..', 'profileimg.png');
   const now = new Date();
   const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
   const uniqueSuffix = `${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
@@ -18,7 +18,7 @@ test('신규 직원을 등록하고 검색 후 삭제한다', async ({ page }) =
 
   await pimPage.goto();
   await pimPage.openAddEmployeeForm();
-  await pimPage.uploadProfilePicture(uploadFilePath);
+  await pimPage.uploadProfilePicture(PROFILE_IMAGE_PATH);
   const employee: EmployeeInfo = {
     firstName: 'ahn',
     middleName: 'in',
@@ -67,17 +67,19 @@ await pimPage.fillBasicInfo(employee);
   });
 
   await pimPage.goto();
+  await pimPage.searchEmployee(employeeNum);
 
   await test.step('Job Detail 저장', async () => {
     await pimPage.goToJobDetails(employeeNum);
     await pimPage.fillJobDetails({
-      jobTitle: 'QA Engineer',
-      jobCategory: 'Engineering',
+      jobTitle: SEED_JOB_TITLE,
+      jobCategory: SEED_JOB_CATEGORY,
       joinedDate: timestamp,
     });
     await pimPage.save();
   });
 
-  await pimPage.searchEmployee(employeeNum);
+  await pimPage.goto();
+  await pimPage.searchEmployeeDetails(SEED_JOB_TITLE);
   await pimPage.deleteEmployee(employeeNum);
 });

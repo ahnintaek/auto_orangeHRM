@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import 'dotenv/config';
 import { LoginPage } from '../pages/loginPage';
 import { AdminPage } from '../pages/adminPage';
+import { STATUS_ENABLED, USER_ROLE_ADMIN } from '../testData/seedData';
 
 test('관리자가 신규 시스템 유저를 등록하고 목록에서 확인한다', async ({ page }) => {
   const loginPage = new LoginPage(page);
@@ -13,9 +14,9 @@ test('관리자가 신규 시스템 유저를 등록하고 목록에서 확인�
 
   await adminPage.goto();
   await adminPage.openAddUserForm();
-  await adminPage.selectUserRole('Admin');
+  await adminPage.selectUserRole(USER_ROLE_ADMIN);
   await adminPage.searchEmployee(employeeName);
-  await adminPage.selectStatus('Enabled');
+  await adminPage.selectStatus(STATUS_ENABLED);
   await adminPage.fillCredentials(userName, process.env.ADMIN_PW!);
   await adminPage.save();
 

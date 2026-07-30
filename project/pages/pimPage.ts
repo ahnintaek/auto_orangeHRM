@@ -1,6 +1,7 @@
 import { Page, expect } from '@playwright/test';
 import { BasePage } from './basePage';
 import { EmployeeInfo } from "../models/employee";
+import { STATUS_ENABLED, SEED_JOB_TITLE } from '../testData/seedData';
 
 interface PersonalDetails {
   driverLicenseNumber: string;
@@ -83,7 +84,7 @@ export class PimPage extends BasePage {
   }
 
   async selectEnabledStatus() {
-    await this.page.getByText('Enabled').click();
+    await this.page.getByText(STATUS_ENABLED).click();
   }
 
   async saveNewEmployee() {
@@ -169,6 +170,13 @@ export class PimPage extends BasePage {
   async searchEmployee(employeeNum:string) {
     await this.waitForPageLoad();
     await this.getFieldInput(/^Employee Id$/).fill(employeeNum)
+  }
+
+  async searchEmployeeDetails(SEED_JOB_TITLE: string) {
+    await this.waitForPageLoad();
+    await this.selectDropdown('Job Title', SEED_JOB_TITLE);
+    await this.page.getByRole('button', { name: 'Search' }).click();
+    await this.page.waitForSelector('.oxd-table-loader', { state: 'hidden' });
   }
 
   async deleteEmployee(employeeNum: string) {

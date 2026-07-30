@@ -1,10 +1,13 @@
 import { Page, expect } from '@playwright/test';
+import path from 'path';
 import { BasePage } from './basePage';
+import { JOB_SPEC_FILE_PATH } from '../testData/filePaths';
 
 interface JobDetails {
   jobName: string;
   jobDescription: string;
   jobNote: string;
+  jobSpecFilePath?: string;
 }
 
 export class JobSettingsPage extends BasePage {
@@ -22,6 +25,12 @@ export class JobSettingsPage extends BasePage {
     // gotoJobTitles()는 이미 호출된 상태라고 가정 (호출부에서 순서 관리)
     await this.addBtn();
     await this.fillAndVerify(this.getFieldInput('Job Title'), jobDetails.jobName);
+
+    const fileSpecGroup = this.getInputGroup('Job Specification');
+    await fileSpecGroup.locator('input[type="file"]').setInputFiles(JOB_SPEC_FILE_PATH)
+    const fileName = path.basename(JOB_SPEC_FILE_PATH);
+    await expect(fileSpecGroup.locator('.oxd-file-input-div')).toHaveText(fileName);
+
     await this.page.getByRole('button', { name: 'Save' }).click();
     await this.waitForPageLoad();
   }
