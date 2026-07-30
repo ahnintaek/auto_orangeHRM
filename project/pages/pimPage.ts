@@ -117,9 +117,8 @@ export class PimPage extends BasePage {
 
   async goToContactDetails() {
     const contactDetailsResponse = this.page.waitForResponse(
-      resp => resp.url().includes('contactDetails') && resp.status() === 200
+      resp => resp.url().includes('contact-details') && resp.status() === 200   // 하이픈, 실제 API
     );
-  
     await this.page.getByRole('link', { name: 'Contact Details' }).click();
     await contactDetailsResponse;
     await this.waitForPageLoad();
@@ -151,7 +150,7 @@ export class PimPage extends BasePage {
     await this.waitForPageLoad();
     
     const jobDetailsResponse = this.page.waitForResponse(
-      resp => resp.url().includes('jobDetails') && resp.status() === 200
+      resp => resp.url().includes('job-details') && resp.status() === 200   // 하이픈, 실제 API
     );
     await this.page.getByRole('link', { name: 'Job' }).click();
     await jobDetailsResponse;
