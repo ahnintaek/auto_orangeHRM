@@ -34,8 +34,8 @@ export class JobSettingsPage extends BasePage {
 
     await row.locator('button:has(.bi-pencil-fill)').click();
     await this.waitForPageLoad();
-    await this.fillAndVerify(this.getFieldInput('Job Description'), jobDetails.jobDescription);
-    await this.fillAndVerify(this.getFieldInput('Note'), jobDetails.jobNote);
+    await this.fillAndVerify(this.getFieldTextArea('Job Description'), jobDetails.jobDescription);
+    await this.fillAndVerify(this.getFieldTextArea('Note'), jobDetails.jobNote);
     await this.page.getByRole('button', { name: 'Save' }).click();
     await this.waitForPageLoad();
   }

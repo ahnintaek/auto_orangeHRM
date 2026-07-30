@@ -35,6 +35,10 @@ export class BasePage {
     return this.getInputGroup(label).locator('input');
   }
 
+  protected getFieldTextArea(label: string | RegExp) {
+    return this.getInputGroup(label).locator('textarea');
+  }
+
   protected getDateInput(label: string | RegExp) {
     return this.getInputGroup(label).locator('.oxd-date-input input');
   }
