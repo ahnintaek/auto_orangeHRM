@@ -4,12 +4,11 @@ import { BasePage } from './basePage';
 export class AdminPage extends BasePage {
 
   async goto() {
-    await this.page.getByRole('link', { name: 'Admin' }).click();
-    await this.waitForPageLoad();
+    await this.gotoModule('Admin');
   }
 
   async openAddUserForm() {
-    await this.page.getByRole('button', { name: 'Add' }).click();
+    await this.addBtn();
   }
 
   async selectUserRole(role: string) {

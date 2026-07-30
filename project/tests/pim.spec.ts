@@ -67,6 +67,17 @@ await pimPage.fillBasicInfo(employee);
   });
 
   await pimPage.goto();
+
+  await test.step('Job Detail 저장', async () => {
+    await pimPage.goToJobDetails(employeeNum);
+    await pimPage.fillJobDetails({
+      jobTitle: 'QA Engineer',
+      jobCategory: 'Engineering',
+      joinedDate: timestamp,
+    });
+    await pimPage.save();
+  });
+
   await pimPage.searchEmployee(employeeNum);
   await pimPage.deleteEmployee(employeeNum);
 });

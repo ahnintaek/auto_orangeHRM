@@ -39,14 +39,19 @@ interface ContactDetails {
   otherEmail: string;
 }
 
+interface JobDetails {
+  jobTitle: string;
+  jobCategory: string;
+  joinedDate: string;         // yyyy-dd-mm
+};
+
 export class PimPage extends BasePage {
   async goto() {
-    await this.page.getByRole('link', { name: 'PIM' }).click();
-    await this.waitForPageLoad();
+    await this.gotoModule('PIM');
   }
 
   async openAddEmployeeForm() {
-    await this.page.getByRole('button', { name: 'Add' }).click();
+    await this.addBtn();
   }
 
   async uploadProfilePicture(filePath: string) {
@@ -135,6 +140,29 @@ export class PimPage extends BasePage {
       [ContactField.OtherEmail, details.otherEmail],
     ]);
     await this.selectDropdown(ContactField.Country, details.country);
+  }
+
+  async goToJobDetails(employeeNum: string) {
+    const jobDetailsResponse = this.page.waitForResponse(
+      resp => resp.url().includes('jobDetails') && resp.status() === 200
+    );
+    const row = this.page.locator('.oxd-table-row').filter({
+      has: this.page.locator(`div:text-is("${employeeNum}")`),
+    });
+    await expect(row).toHaveCount(1);
+    await row.locator('button:has(.bi-pencil)').click();
+  
+    await this.page.getByRole('link', { name: 'Job' }).click();
+    await jobDetailsResponse;
+    await this.waitForPageLoad();
+    await expect(this.page.getByRole('heading', { name: 'Job Details' })).toBeVisible({ timeout: 30000 });
+  }
+
+  async fillJobDetails(details: JobDetails) {
+    await this.fillAndVerify(this.getDateInput("Joined Date"), details.joinedDate);
+    await this.fillAndVerify(this.getDateInput("Job Title"), details.jobTitle);
+    await this.fillAndVerify(this.getDateInput("Job Category"), details.jobCategory);
+    await this.addBtn();
   }
 
   async searchEmployee(employeeNum:string) {
