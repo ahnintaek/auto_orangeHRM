@@ -21,7 +21,7 @@ export class JobSettingsPage extends BasePage {
   async addJobDetails(jobDetails: JobDetails) {
     // gotoJobTitles()는 이미 호출된 상태라고 가정 (호출부에서 순서 관리)
     await this.addBtn();
-    await this.fillAndVerify(this.getFieldInput('Job Name'), jobDetails.jobName);
+    await this.fillAndVerify(this.getFieldInput('Job Title'), jobDetails.jobName);
     await this.page.getByRole('button', { name: 'Save' }).click();
     await this.waitForPageLoad();
   }
@@ -45,7 +45,7 @@ export class JobSettingsPage extends BasePage {
     await this.page.getByRole('menuitem', { name: 'Job Categories' }).click();
     await this.waitForPageLoad();
   }
-  
+
   async addJobCategory(categoryName: string) {
     // gotoJobCategories()는 이미 호출된 상태라고 가정
     await this.addBtn();
