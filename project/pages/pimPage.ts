@@ -150,7 +150,7 @@ export class PimPage extends BasePage {
       has: this.page.locator(`div:text-is("${employeeNum}")`),
     });
     await expect(row).toHaveCount(1);
-    await row.locator('button:has(.bi-pencil)').click();
+    await row.locator('button:has(.bi-pencil-fill)').click();
   
     await this.page.getByRole('link', { name: 'Job' }).click();
     await jobDetailsResponse;

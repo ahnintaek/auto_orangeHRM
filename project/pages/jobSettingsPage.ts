@@ -32,7 +32,7 @@ export class JobSettingsPage extends BasePage {
     });
     await expect(row).toHaveCount(1);
 
-    await row.locator('button:has(.bi-pencil)').click();
+    await row.locator('button:has(.bi-pencil-fill)').click();
     await this.waitForPageLoad();
     await this.fillAndVerify(this.getFieldInput('Job Description'), jobDetails.jobDescription);
     await this.fillAndVerify(this.getFieldInput('Note'), jobDetails.jobNote);
