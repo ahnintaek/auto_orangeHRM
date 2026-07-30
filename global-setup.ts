@@ -9,7 +9,8 @@ async function globalSetup() {
         headless: !!process.env.CI,
         slowMo: process.env.CI ? 0 : 300,
       });
-      const page = await browser.newPage();
+      const context = await browser.newContext({ baseURL: 'http://localhost:8080' });
+      const page = await context.newPage();
 
   // 1) 컨테이너가 완전히 응답할 때까지 재시도
   let ready = false;
