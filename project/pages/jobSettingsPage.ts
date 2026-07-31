@@ -7,7 +7,6 @@ interface JobDetails {
   jobName: string;
   jobDescription: string;
   jobNote: string;
-  jobSpecFilePath?: string;
 }
 
 export class JobSettingsPage extends BasePage {

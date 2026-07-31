@@ -1,14 +1,12 @@
 import { Page } from '@playwright/test';
 import { expect, Locator } from '@playwright/test';
-import { getInputGroup, selectDropdown } from '../utils/formHelpers';
+import { getInputGroup, selectDropdown, waitForFormReady  } from '../utils/formHelpers';
 
 export class BasePage {
   constructor(protected readonly page: Page) {}
 
   protected async waitForPageLoad() {
-    const loader = this.page.locator('.oxd-form-loader');
-    await loader.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
-    await loader.waitFor({ state: 'hidden', timeout: 10000 });
+    await waitForFormReady(this.page);
   }
 
   protected async fillAndVerify(input: Locator, value: string) {
