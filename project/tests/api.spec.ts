@@ -6,6 +6,10 @@ import { SEED_JOB_TITLE } from '../testData/seedData';
 test('Job Titles 목록 내 시드 데이터 조회 API 테스트', async ({ page }) => {
   const loginPage = new LoginPage(page);
   await loginPage.loginAsAdmin();
+  await page.waitForURL('**/dashboard/**', { timeout: 15000 });
+
+  const cookies = await page.context().cookies();
+  console.log('로그인 후 쿠키:', JSON.stringify(cookies.map(c => ({ name: c.name, domain: c.domain, path: c.path }))));
 
   const result = await page.evaluate(async () => {
     const res = await fetch(
