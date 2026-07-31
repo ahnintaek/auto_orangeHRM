@@ -4,23 +4,26 @@ import { LoginPage } from '../pages/loginPage';
 import { SEED_JOB_TITLE } from '../testData/seedData';
 
 test('Job Titles 목록 내 시드 데이터 조회 API 테스트', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.loginAsAdmin();
+  const loginPage = new LoginPage(page);
+  await loginPage.loginAsAdmin();
 
-    const response = await page.context().request.get(
-        '/web/index.php/api/v2/admin/job-titles?limit=50&offset=0&sortField=jt.jobTitleName&sortOrder=ASC'
-        );
+  const result = await page.evaluate(async () => {
+    const res = await fetch(
+      '/web/index.php/api/v2/admin/job-titles?limit=50&offset=0&sortField=jt.jobTitleName&sortOrder=ASC',
+      { headers: { 'Accept': 'application/json' } }
+    );
+    const body = await res.json();
+    return { status: res.status, ok: res.ok, body };
+  });
 
-        if (!response.ok()) {
-        console.log('API 실패 - status:', response.status());
-        console.log('API 실패 - body:', await response.text());
-        }
+  if (!result.ok) {
+    console.log('API 실패 - status:', result.status);
+    console.log('API 실패 - body:', JSON.stringify(result.body));
+  }
 
-    expect(response.ok()).toBeTruthy();
-    expect(response.status()).toBe(200);
+  expect(result.ok).toBeTruthy();
+  expect(result.status).toBe(200);
 
-    const body = await response.json();
-    const jobTitleNames: string[] = body.data.map((item: { title: string }) => item.title);
-
-    expect(jobTitleNames).toContain(SEED_JOB_TITLE);
+  const jobTitleNames: string[] = result.body.data.map((item: { title: string }) => item.title);
+  expect(jobTitleNames).toContain(SEED_JOB_TITLE);
 });
