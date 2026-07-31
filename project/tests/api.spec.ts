@@ -4,18 +4,23 @@ import { LoginPage } from '../pages/loginPage';
 import { SEED_JOB_TITLE } from '../testData/seedData';
 
 test('Job Titles 목록 내 시드 데이터 조회 API 테스트', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.loginAsAdmin();
+    const loginPage = new LoginPage(page);
+    await loginPage.loginAsAdmin();
 
-  const response = await page.context().request.get(
-    '/web/index.php/api/v2/admin/job-titles?limit=50&offset=0&sortField=jt.jobTitleName&sortOrder=ASC'
-  );
+    const response = await page.context().request.get(
+        '/web/index.php/api/v2/admin/job-titles?limit=50&offset=0&sortField=jt.jobTitleName&sortOrder=ASC'
+        );
 
-  expect(response.ok()).toBeTruthy();
-  expect(response.status()).toBe(200);
+        if (!response.ok()) {
+        console.log('API 실패 - status:', response.status());
+        console.log('API 실패 - body:', await response.text());
+        }
 
-  const body = await response.json();
-  const jobTitleNames: string[] = body.data.map((item: { title: string }) => item.title);
+    expect(response.ok()).toBeTruthy();
+    expect(response.status()).toBe(200);
 
-  expect(jobTitleNames).toContain(SEED_JOB_TITLE);
+    const body = await response.json();
+    const jobTitleNames: string[] = body.data.map((item: { title: string }) => item.title);
+
+    expect(jobTitleNames).toContain(SEED_JOB_TITLE);
 });
