@@ -8,9 +8,6 @@ test('Job Titles 목록 내 시드 데이터 조회 API 테스트', async ({ pag
   await loginPage.loginAsAdmin();
   await page.waitForURL('**/dashboard/**', { timeout: 15000 });
 
-  const cookies = await page.context().cookies();
-  console.log('로그인 후 쿠키:', JSON.stringify(cookies.map(c => ({ name: c.name, domain: c.domain, path: c.path }))));
-
   const result = await page.evaluate(async () => {
     const res = await fetch(
       '/web/index.php/api/v2/admin/job-titles?limit=50&offset=0&sortField=jt.jobTitleName&sortOrder=ASC',
