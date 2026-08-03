@@ -5,8 +5,7 @@ export class BuzzPage extends BasePage {
 
     private getPost(message: string): Locator {
     return this.page
-      .locator('.orangehrm-buzz-post-body')
-      .locator('.oxd-text')
+      .locator('.orangehrm-buzz-post-body-text')
       .filter({ hasText: message });
     }
 
