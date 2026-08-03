@@ -6,17 +6,9 @@
     "code": "playwright codegen http://localhost:8080",
     "hrm": "playwright test",
     "hrm_admin": "playwright test admin.spec.ts",
-    "hrm_pim": "playwright test pim.spec.ts"
-  },
-  "pkg": {
-    "scripts": [
-      "dist/**/*.js"
-    ],
-    "assets": [
-      "node_modules/inquirer/**/*",
-      "node_modules/@inquirer/**/*",
-      "node_modules/tslib/**/*"
-    ]
+    "hrm_pim": "playwright test pim.spec.ts",
+    "hrm_job": "playwright test job.spec.ts",
+    "hrm_api": "playwright test api.spec.ts"
   },
   "keywords": [],
   "author": "",
