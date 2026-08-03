@@ -1,0 +1,58 @@
+name: Run Playwright Test
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start OrangeHRM (Docker Compose)
+        run: docker compose up -d
+
+      - name: Wait for OrangeHRM to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 | grep -q "200\|302"; then
+              echo "OrangeHRM is up!"
+              exit 0
+            fi
+            echo "Waiting for OrangeHRM... ($i)"
+            sleep 5
+          done
+          echo "OrangeHRM did not start in time"
+          exit 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test
+        env:
+          ADMIN_ID: ${{ secrets.ADMIN_ID }}
+          ADMIN_PW: ${{ secrets.ADMIN_PW }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 30
+
+      - name: Stop containers
+        if: always()
+        run: docker compose down -v
