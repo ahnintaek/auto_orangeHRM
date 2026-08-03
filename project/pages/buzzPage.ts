@@ -38,6 +38,9 @@ export class BuzzPage extends BasePage {
         const messageInput = this.page.locator('textarea[placeholder="What\'s on your mind?"]');
         await messageInput.fill(message);
         await this.page.getByRole('button', { name: 'Post', exact: true }).click();
+        const loader = this.page.locator('.oxd-loading-spinner-container');
+        await loader.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
+        await loader.waitFor({ state: 'hidden', timeout: 10000 });
         await expect(this.getPost(message)).toHaveCount(1);
     }
 
@@ -98,6 +101,9 @@ export class BuzzPage extends BasePage {
         await expect(commentItem).toHaveCount(1);
         await commentItem.getByText('Delete', { exact: true }).click();
         await this.page.getByRole('button', { name: 'Yes, Delete' }).click();
+        const loader = this.page.locator('.oxd-loading-spinner-container');
+        await loader.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
+        await loader.waitFor({ state: 'hidden', timeout: 10000 });
         await expect(commentItem).toHaveCount(0);
     }
 }
