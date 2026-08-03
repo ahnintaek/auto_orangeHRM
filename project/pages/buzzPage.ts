@@ -4,21 +4,23 @@ import { BasePage } from './basePage';
 export class BuzzPage extends BasePage {
 
     private getPost(message: string): Locator {
-    return this.page
-      .locator('.orangehrm-buzz-post-body-text')
-      .filter({ hasText: message });
+        return this.page.locator('.orangehrm-buzz').filter({
+            has: this.page.locator('.orangehrm-buzz-post-body-text', {
+                hasText: message,
+            }),
+        });
     }
 
     private getCommentButton(post: Locator): Locator {
-     return post.locator('button', { has: this.page.locator('.bi-chat-text-fill') });
+        return post.locator('button', { has: this.page.locator('.bi-chat-text-fill') });
     }
 
     private getCommentArea(post: Locator): Locator {
-     return post.locator('.orangehrm-buzz-comment');
+        return post.locator('.orangehrm-buzz-comment');
     }
 
     private getComment(post: Locator, comment: string): Locator {
-    return post
+        return post
         .locator('.orangehrm-post-comment')
         .filter({ hasText: comment });
     }
@@ -27,7 +29,16 @@ export class BuzzPage extends BasePage {
         const commentArea = this.getCommentArea(post);
         if (!(await commentArea.isVisible())) {
             await this.getCommentButton(post).click();
+            await expect(commentArea).toBeVisible();
         }
+    }
+
+    private getCommentInput(post: Locator): Locator {
+        return post.locator('.orangehrm-buzz-comment-add .oxd-input');
+    }
+    
+    private getEditCommentInput(post: Locator): Locator {
+        return post.locator('.orangehrm-post-comment .oxd-input');
     }
 
     async goto() {
@@ -49,7 +60,7 @@ export class BuzzPage extends BasePage {
         await expect(post).toHaveCount(1);
         const likeButton = post.locator('.orangehrm-heart-icon');
         await likeButton.click();
-        await expect(this.page.locator('.orangehrm-like-animation')).toBeVisible();
+        await expect(post.locator('.orangehrm-like-animation')).toBeVisible();
     }
 
     async deletePost(message: string) {
@@ -65,11 +76,11 @@ export class BuzzPage extends BasePage {
         const post = this.getPost(message);
         await expect(post).toHaveCount(1);
         await this.ensureCommentAreaOpen(post);
-        const commentInput = post.locator('textarea[placeholder="Write a comment..."]');
+        const commentInput = this.getCommentInput(post);
         await expect(commentInput).toBeVisible();
         await commentInput.fill(comment);
         await commentInput.press('Enter');
-        await expect(post.locator('.orangehrm-post-comment-text')).toContainText(comment);
+        await expect(this.getComment(post, comment)).toHaveCount(1);
     }
 
     async likeComment(message: string, comment: string) {
@@ -88,8 +99,14 @@ export class BuzzPage extends BasePage {
         const commentItem = this.getComment(post, comment);
         await expect(commentItem).toHaveCount(1);
         await commentItem.getByText('Edit', { exact: true }).click();
-        await commentItem.locator('.oxd-input').fill(newComment);
-        await commentItem.locator('.oxd-input').press('Enter');
+        const editInput = this.getEditCommentInput(commentItem);
+        if(!(await editInput.isVisible())) {
+            await commentItem.getByText('Edit', { exact: true }).click();
+        }
+        // await expect(editInput).toBeVisible();
+        await post.locator('.orangehrm-post-comment .oxd-input').fill(newComment);
+        await post.locator('.orangehrm-post-comment .oxd-input').press('Enter');
+        await expect(editInput).toBeHidden();
         await expect(this.getComment(post, newComment)).toHaveCount(1);
     }
 

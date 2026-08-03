@@ -9,9 +9,9 @@ test('Buzz Post 등록, 수정, 삭제 테스트', async ({ page }) => {
     
       const now = new Date();
       const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
-      const uniqueSuffix = `${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
+      const uniqueSuffix = `${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
 
-      const postText = `Post Test, Date : ${timestamp}`;
+      const postText = `Post Test, Date : ${timestamp} ${uniqueSuffix}`;
       const commentText = `Comment Test : ${uniqueSuffix}`;
       const editComment = `Edit Comment : ${uniqueSuffix}`;
     
