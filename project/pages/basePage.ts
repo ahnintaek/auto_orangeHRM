@@ -58,6 +58,20 @@ export class BasePage {
     await this.page.getByRole('button', { name: 'Add' }).click();
   }
 
+    protected async clickUntilVisible(trigger: Locator, maxAttempts = 3) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      await trigger.click();
+      try {
+        await expect(trigger).toBeVisible({ timeout: 5000 });
+        return;
+      } catch {
+        if (attempt === maxAttempts) {
+          throw new Error(`${maxAttempts}번 반복 클릭 실패`);
+        }
+      }
+    }
+  }
+
   async save() {
     await this.getForm()
       .getByRole('button', { name: 'Save', exact: true })
@@ -68,19 +82,7 @@ export class BasePage {
     return (await this.page.locator('.oxd-userdropdown-name').innerText()).trim();
   }
 
-  protected async clickUntilVisible(trigger: Locator, target: Locator, maxAttempts = 3) {
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      await trigger.click();
-      try {
-        await expect(target).toBeVisible({ timeout: 5000 });
-        return;
-      } catch {
-        if (attempt === maxAttempts) {
-          throw new Error(`${maxAttempts}번 반복 클릭 실패`);
-        }
-      }
-    }
-  }
+
 
   async logout() {
     await this.page.locator('.oxd-userdropdown-name').click();
