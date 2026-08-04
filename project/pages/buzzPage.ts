@@ -36,9 +36,9 @@ export class BuzzPage extends BasePage {
     private getCommentInput(post: Locator): Locator {
         return post.locator('.orangehrm-buzz-comment-add .oxd-input');
     }
-    
-    private getEditCommentInput(commentItem: Locator): Locator {
-        return commentItem.locator('.oxd-input');
+
+    private getEditCommentInput(post: Locator): Locator {
+        return post.locator('.orangehrm-post-comment .oxd-input');
     }
 
     async goto() {
@@ -98,13 +98,15 @@ export class BuzzPage extends BasePage {
         await this.ensureCommentAreaOpen(post);
         const commentItem = this.getComment(post, comment);
         await expect(commentItem).toHaveCount(1);
-        const editButton = commentItem.getByText('Edit', { exact: true });
-        const editInput = post.locator('.orangehrm-post-comment .oxd-input');
-        await this.clickUntilVisible(editButton, editInput);
-        await editInput.fill(newComment);
-        await editInput.press('Enter');
+        await commentItem.getByText('Edit', { exact: true }).click();
+        const editInput = this.getEditCommentInput(commentItem);
+        if(!(await editInput.isVisible())) {
+            await commentItem.getByText('Edit', { exact: true }).click();
+        }
+        await post.locator('.orangehrm-post-comment .oxd-input').fill(newComment);
+        await post.locator('.orangehrm-post-comment .oxd-input').press('Enter');
         await expect(editInput).toBeHidden();
-        await expect(post.locator('.orangehrm-post-comment')).toContainText(newComment, { timeout: 10000 });
+        await expect(this.getComment(post, newComment)).toHaveCount(1);
     }
 
     async deleteComment(message: string, comment: string) {
