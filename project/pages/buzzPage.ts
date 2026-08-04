@@ -37,8 +37,8 @@ export class BuzzPage extends BasePage {
         return post.locator('.orangehrm-buzz-comment-add .oxd-input');
     }
     
-    private getEditCommentInput(post: Locator): Locator {
-        return post.locator('.orangehrm-post-comment .oxd-input');
+    private getEditCommentInput(commentItem: Locator): Locator {
+        return commentItem.locator('.oxd-input');
     }
 
     async goto() {

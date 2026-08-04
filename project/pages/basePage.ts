@@ -69,18 +69,18 @@ export class BasePage {
   }
 
   protected async clickUntilVisible(trigger: Locator, target: Locator, maxAttempts = 3) {
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    await trigger.click();
-    try {
-      await target.waitFor({ state: 'visible', timeout: 2000 });
-      return;
-    } catch {
-      if (attempt === maxAttempts) {
-        throw new Error(`${maxAttempts}번 반복 클릭 실패`);
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      await trigger.click();
+      try {
+        await expect(target).toBeVisible({ timeout: 5000 });
+        return;
+      } catch {
+        if (attempt === maxAttempts) {
+          throw new Error(`${maxAttempts}번 반복 클릭 실패`);
+        }
       }
     }
   }
-}
 
   async logout() {
     await this.page.locator('.oxd-userdropdown-name').click();
