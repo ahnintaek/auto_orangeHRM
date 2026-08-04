@@ -68,6 +68,20 @@ export class BasePage {
     return (await this.page.locator('.oxd-userdropdown-name').innerText()).trim();
   }
 
+  protected async clickUntilVisible(trigger: Locator, target: Locator, maxAttempts = 3) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    await trigger.click();
+    try {
+      await target.waitFor({ state: 'visible', timeout: 2000 });
+      return;
+    } catch {
+      if (attempt === maxAttempts) {
+        throw new Error(`${maxAttempts}번 반복 클릭 실패`);
+      }
+    }
+  }
+}
+
   async logout() {
     await this.page.locator('.oxd-userdropdown-name').click();
     await this.page.getByRole('menuitem', { name: 'Logout' }).click();

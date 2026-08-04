@@ -37,8 +37,8 @@ export class BuzzPage extends BasePage {
         return post.locator('.orangehrm-buzz-comment-add .oxd-input');
     }
     
-    private getEditCommentInput(post: Locator): Locator {
-        return post.locator('.orangehrm-post-comment .oxd-input');
+    private getEditCommentInput(commentItem: Locator): Locator {
+        return commentItem.locator('.oxd-input');
     }
 
     async goto() {
@@ -98,14 +98,11 @@ export class BuzzPage extends BasePage {
         await this.ensureCommentAreaOpen(post);
         const commentItem = this.getComment(post, comment);
         await expect(commentItem).toHaveCount(1);
-        await commentItem.getByText('Edit', { exact: true }).click();
+        const editButton = commentItem.getByText('Edit', { exact: true });
         const editInput = this.getEditCommentInput(commentItem);
-        if(!(await editInput.isVisible())) {
-            await commentItem.getByText('Edit', { exact: true }).click();
-        }
-        // await expect(editInput).toBeVisible();
-        await post.locator('.orangehrm-post-comment .oxd-input').fill(newComment);
-        await post.locator('.orangehrm-post-comment .oxd-input').press('Enter');
+        await this.clickUntilVisible(editButton, editInput);
+        await editInput.fill(newComment);
+        await editInput.press('Enter');
         await expect(editInput).toBeHidden();
         await expect(this.getComment(post, newComment)).toHaveCount(1);
     }
@@ -118,9 +115,6 @@ export class BuzzPage extends BasePage {
         await expect(commentItem).toHaveCount(1);
         await commentItem.getByText('Delete', { exact: true }).click();
         await this.page.getByRole('button', { name: 'Yes, Delete' }).click();
-        const loader = this.page.locator('.oxd-loading-spinner-container');
-        await loader.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
-        await loader.waitFor({ state: 'hidden', timeout: 10000 });
         await expect(commentItem).toHaveCount(0);
     }
 }
