@@ -14,23 +14,23 @@
 ```
 Error: expect(locator).toContainText(expected) failed
 
-Locator: locator('.orangehrm-buzz').filter({ has: locator('.orangehrm-buzz-post-body-text').filter({ hasText: 'Post Test, Date : 2026-08-04 081103' }) }).locator('.orangehrm-post-comment')
-Expected substring: "Edit Comment : 081103"
-Received string:    "ahn  intaekComment Test : 081103Read More2026-08-04 08:11 AM1LikeEditDelete"
+Locator: locator('.orangehrm-buzz').filter({ has: locator('.orangehrm-buzz-post-body-text').filter({ hasText: 'Post Test, Date : 2026-08-04 082246' }) }).locator('.orangehrm-post-comment')
+Expected substring: "Edit Comment : 082246"
+Received string:    "ahn  intaekComment Test : 082246Read More2026-08-04 08:22 AM1LikeEditDelete"
 Timeout: 10000ms
 
 Call log:
   - Expect "toContainText" with timeout 10000ms
-  - waiting for locator('.orangehrm-buzz').filter({ has: locator('.orangehrm-buzz-post-body-text').filter({ hasText: 'Post Test, Date : 2026-08-04 081103' }) }).locator('.orangehrm-post-comment')
+  - waiting for locator('.orangehrm-buzz').filter({ has: locator('.orangehrm-buzz-post-body-text').filter({ hasText: 'Post Test, Date : 2026-08-04 082246' }) }).locator('.orangehrm-post-comment')
     24 × locator resolved to <div data-v-2d912105="" class="orangehrm-post-comment">…</div>
-       - unexpected value "ahn  intaekComment Test : 081103Read More2026-08-04 08:11 AM1LikeEditDelete"
+       - unexpected value "ahn  intaekComment Test : 082246Read More2026-08-04 08:22 AM1LikeEditDelete"
 
 ```
 
 ```yaml
 - paragraph: ahn intaek
-- text: "Comment Test : 081103"
-- paragraph: 2026-08-04 08:11 AM
+- text: "Comment Test : 082246"
+- paragraph: 2026-08-04 08:22 AM
 - text: 
 - paragraph: "1"
 - paragraph: Like
