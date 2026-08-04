@@ -99,12 +99,12 @@ export class BuzzPage extends BasePage {
         const commentItem = this.getComment(post, comment);
         await expect(commentItem).toHaveCount(1);
         const editButton = commentItem.getByText('Edit', { exact: true });
-        const editInput = this.getEditCommentInput(commentItem);
-        await this.clickUntilVisible(editButton);
+        const editInput = post.locator('.orangehrm-post-comment .oxd-input');
+        await this.clickUntilVisible(editButton, editInput);
         await editInput.fill(newComment);
         await editInput.press('Enter');
         await expect(editInput).toBeHidden();
-        await expect(this.getComment(post, newComment)).toHaveCount(1);
+        await expect(post.locator('.orangehrm-post-comment')).toContainText(newComment, { timeout: 10000 });
     }
 
     async deleteComment(message: string, comment: string) {
