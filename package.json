@@ -8,7 +8,8 @@
     "hrm_admin": "playwright test admin.spec.ts",
     "hrm_pim": "playwright test pim.spec.ts",
     "hrm_job": "playwright test job.spec.ts",
-    "hrm_api": "playwright test api.spec.ts"
+    "hrm_api": "playwright test api.spec.ts",
+    "hrm_buzz": "playwright test buzz.spec.ts"
   },
   "keywords": [],
   "author": "",
