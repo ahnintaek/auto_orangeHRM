@@ -16,6 +16,8 @@ const loginCases: LoginCase[] = [
   { description: '존재하지 않는 아이디', username: 'no_Admin', password: 'admin123', expectedError: 'invalid' },
 ];
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe('로그인 실패 검증', () => {
   for (const c of loginCases) {
     test(`로그인 실패 - ${c.description}`, async ({ page }) => {
@@ -37,4 +39,17 @@ test.describe('로그인 실패 검증', () => {
       await expect(page).toHaveURL(/auth\/login/);
     });
   }
+});
+
+test.describe('로그인 성공 및 로그아웃', () => {
+  test('올바른 자격증명으로 로그인하고, 로그아웃하면 로그인 화면으로 돌아간다', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.loginAsAdmin();
+    await page.waitForURL('**/dashboard/**');
+ 
+    await page.locator('.oxd-userdropdown-name').click();
+    await page.getByRole('menuitem', { name: 'Logout' }).click();
+ 
+    await expect(page).toHaveURL(/auth\/login/);
+  });
 });

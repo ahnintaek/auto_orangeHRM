@@ -170,6 +170,8 @@ export class PimPage extends BasePage {
   async searchEmployee(employeeNum:string) {
     await this.waitForPageLoad();
     await this.getFieldInput(/^Employee Id$/).fill(employeeNum)
+    await this.page.getByRole('button', { name: 'Search' }).click();
+    await this.page.waitForSelector('.oxd-table-loader', { state: 'hidden' });
   }
 
   async searchEmployeeDetails(jobTitle: string) {
@@ -189,6 +191,6 @@ export class PimPage extends BasePage {
   
     await row.locator('button:has(.bi-trash)').click();
     await this.page.getByRole('button', { name: 'Yes, Delete' }).click();
-    await expect(this.page.getByText('Succesfully Deleted'))
+    await expect(this.page.getByText(employeeNum)).not.toBeVisible();
   }
 }

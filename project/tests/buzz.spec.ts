@@ -1,10 +1,8 @@
-import { test } from '@playwright/test';
+import { test } from '../fixtures/authedPage.fixture';
 import 'dotenv/config';
-import { LoginPage } from '../pages/loginPage';
 import { BuzzPage } from '../pages/buzzPage';
 
-test('Buzz Post 등록, 수정, 삭제 테스트', async ({ page }) => {
-      const loginPage = new LoginPage(page);
+test('Buzz Post 등록, 수정, 삭제 테스트', async ({ authedPage: page }) => {
       const buzzPage = new BuzzPage(page);
     
       const now = new Date();
@@ -14,9 +12,7 @@ test('Buzz Post 등록, 수정, 삭제 테스트', async ({ page }) => {
       const postText = `Post Test, Date : ${timestamp} ${uniqueSuffix}`;
       const commentText = `Comment Test : ${uniqueSuffix}`;
       const editComment = `Edit Comment : ${uniqueSuffix}`;
-    
-      await loginPage.loginAsAdmin();
-    
+        
       await buzzPage.goto();
 
       await buzzPage.addPost(postText);

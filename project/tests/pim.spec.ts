@@ -1,20 +1,16 @@
-import { test, expect } from '@playwright/test';
+import { test } from '../fixtures/authedPage.fixture';
 import 'dotenv/config';
-import { LoginPage } from '../pages/loginPage';
 import { PimPage } from '../pages/pimPage';
 import { EmployeeInfo } from "../models/employee";
 import { PROFILE_IMAGE_PATH } from '../testData/filePaths';
 import { SEED_JOB_TITLE, SEED_JOB_CATEGORY } from '../testData/seedData';
 
-test('신규 직원을 등록하고 검색 후 삭제한다', async ({ page }) => {
-  const loginPage = new LoginPage(page);
+test('신규 직원을 등록하고 검색 후 삭제한다', async ({ authedPage: page }) => {
   const pimPage = new PimPage(page);
 
   const now = new Date();
   const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
   const uniqueSuffix = `${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
-
-  await loginPage.loginAsAdmin();
 
   await pimPage.goto();
   await pimPage.openAddEmployeeForm();
