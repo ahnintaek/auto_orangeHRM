@@ -1,10 +1,8 @@
-import { test } from '@playwright/test';
+import { test } from '../fixtures/authedPage.fixture';
 import 'dotenv/config';
-import { LoginPage } from '../pages/loginPage';
 import { JobSettingsPage } from '../pages/jobSettingsPage';
 
-test('Job Title을 등록하고 수정한다', async ({ page }) => {
-  const loginPage = new LoginPage(page);
+test('Job Title을 등록하고 수정한다', async ({ authedPage: page }) => {
   const jobSettingsPage = new JobSettingsPage(page);
   const uniqueSuffix = Date.now();
 
@@ -14,7 +12,6 @@ test('Job Title을 등록하고 수정한다', async ({ page }) => {
     jobNote: `note_${uniqueSuffix}`,
   };
 
-  await loginPage.loginAsAdmin();
   await jobSettingsPage.goto();
   await jobSettingsPage.gotoJobTitles();
   await jobSettingsPage.addJobDetails(jobDetails);

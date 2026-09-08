@@ -1,13 +1,8 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/authedPage.fixture';
 import 'dotenv/config';
-import { LoginPage } from '../pages/loginPage';
 import { SEED_JOB_TITLE } from '../testData/seedData';
 
-test('Job Titles 목록 내 시드 데이터 조회 API 테스트', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.loginAsAdmin();
-  await page.waitForURL('**/dashboard/**', { timeout: 15000 });
-
+test('Job Titles 목록 내 시드 데이터 조회 API 테스트', async ({ authedPage: page }) => {
   const result = await page.evaluate(async () => {
     const res = await fetch(
       '/web/index.php/api/v2/admin/job-titles?limit=50&offset=0&sortField=jt.jobTitleName&sortOrder=ASC',
