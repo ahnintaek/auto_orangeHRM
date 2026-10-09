@@ -31,7 +31,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22        # 로컬에서 쓰는 메이저 버전으로 고정
+          node-version: 22
           cache: npm
 
       - name: Install dependencies

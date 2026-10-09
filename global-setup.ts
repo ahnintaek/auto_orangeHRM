@@ -95,7 +95,7 @@ async function globalSetup() {
   const jobSettingsPage = new JobSettingsPage(page);
 
   await loginPage.goto();
-  await loginPage.login(env.adminId!, env.adminPw!);
+  await loginPage.login(env.adminId, env.adminPw);
   await jobSettingsPage.goto();
 
   // 1) Job Title 시딩 (기존)

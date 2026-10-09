@@ -16,15 +16,15 @@ export class LoginPage {
 
   async loginAsAdmin() {
     await this.goto();
-    await this.login(env.adminId!, env.adminPw!);
+    await this.login(env.adminId, env.adminPw);
   }
 
-  async getRequiredErrorLocator() {
-    return this.page.getByText('Required', { exact: true });
+  get invalidCredentialsError() {
+    return this.page.getByText('Invalid credentials', { exact: true });
   }
 
-  async getInvalidCredentialsError() {
-    return this.page.locator('.oxd-alert-content-text');
+  get requiredErrors() {
+    return this.page.getByText('Required', {exact: true,});
   }
 
 }
