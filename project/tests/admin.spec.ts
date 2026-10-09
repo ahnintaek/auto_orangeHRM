@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { AdminPage } from '../pages/adminPage';
 import { STATUS_ENABLED, USER_ROLE_ADMIN } from '../testData/seedData';
 
-test('관리자가 신규 시스템 유저를 등록하고 목록에서 확인한다', async ({ authedPage:page }) => {
+test('관리자가 신규 시스템 유저를 등록하고 목록에서 확인한다', async ({ authedPage:page, cleanup }) => {
   const adminPage = new AdminPage(page);
   const userName = `Holland_${Date.now()}`;
 
@@ -16,9 +16,9 @@ test('관리자가 신규 시스템 유저를 등록하고 목록에서 확인�
   await adminPage.selectStatus(STATUS_ENABLED);
   await adminPage.fillCredentials(userName, process.env.ADMIN_PW!);
   await adminPage.save();
+  cleanup.add(`user ${userName}`, () => adminPage.deleteUserByName(userName));
 
   await adminPage.assertUserListVisible();
   await expect(page.getByText(userName)).toBeVisible();
-  await adminPage.deleteEmployee();
 
 });

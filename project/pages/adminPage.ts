@@ -47,10 +47,17 @@ export class AdminPage extends BasePage {
     await expect(this.page.getByRole('heading', { name: 'System Users' })).toBeVisible();
   }
 
-  async deleteEmployee() {
+  userRow(username: string) {
+    return this.page.locator('.oxd-table-card').filter({
+      has: this.page.getByText(username, { exact: true }),
+    });
+  }
+  
+  async deleteUserByName(username: string) {
     await this.waitForPageLoad();
-    await this.page.locator('.oxd-icon.bi-check').first().click();
-    await this.page.getByRole('button', { name: 'Delete Selected' }).click();
+    const row = this.userRow(username);
+    await row.locator('.oxd-icon.bi-trash').click();
     await this.page.getByRole('button', { name: 'Yes, Delete' }).click();
+    await expect(row).toHaveCount(0);
   }
 }
