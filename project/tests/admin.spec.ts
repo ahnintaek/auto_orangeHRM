@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures/authedPage.fixture';
-import 'dotenv/config';
+import { env } from '../utils/env';
 import { AdminPage } from '../pages/adminPage';
 import { STATUS_ENABLED, USER_ROLE_ADMIN } from '../testData/seedData';
 
@@ -14,7 +14,7 @@ test('관리자가 신규 시스템 유저를 등록하고 목록에서 확인�
   await adminPage.selectUserRole(USER_ROLE_ADMIN);
   await adminPage.searchEmployee(employeeName);
   await adminPage.selectStatus(STATUS_ENABLED);
-  await adminPage.fillCredentials(userName, process.env.ADMIN_PW!);
+  await adminPage.fillCredentials(userName, env.adminPw!);
   await adminPage.save();
   cleanup.add(`user ${userName}`, () => adminPage.deleteUserByName(userName));
 

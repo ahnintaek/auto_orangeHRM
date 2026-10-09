@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import { env } from '../utils/env';
 
 export class LoginPage {
   constructor(private readonly page: Page) {}
@@ -15,7 +16,7 @@ export class LoginPage {
 
   async loginAsAdmin() {
     await this.goto();
-    await this.login(process.env.ADMIN_ID!, process.env.ADMIN_PW!);
+    await this.login(env.adminId!, env.adminPw!);
   }
 
   async getRequiredErrorLocator() {

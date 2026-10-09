@@ -1,5 +1,4 @@
 import { test, expect } from '../fixtures/authedPage.fixture';
-import 'dotenv/config';
 import { SEED_JOB_TITLE } from '../testData/seedData';
 
 test('Job Titles 목록 내 시드 데이터 조회 API 테스트', async ({ authedPage: page }) => {

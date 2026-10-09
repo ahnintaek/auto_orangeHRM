@@ -1,5 +1,5 @@
 import { chromium } from '@playwright/test';
-import 'dotenv/config';
+import { env } from './project/utils/env';
 import { selectDropdown, waitForFormReady, goToNextInstallerStep } from './project/utils/formHelpers';
 import { JobSettingsPage } from './project/pages/jobSettingsPage';
 import { LoginPage } from './project/pages/loginPage';
@@ -8,8 +8,8 @@ import { SEED_JOB_TITLE, SEED_JOB_CATEGORY } from './project/testData/seedData';
 
 async function globalSetup() {
     const browser = await chromium.launch({
-        headless: !!process.env.CI,
-        slowMo: process.env.CI ? 0 : 300,
+        headless: env.isCI,
+        slowMo: env.isCI ? 0 : 300,
       });
       const context = await browser.newContext({ baseURL: 'http://localhost:8080' });
       const page = await context.newPage();
@@ -18,7 +18,7 @@ async function globalSetup() {
   let ready = false;
   for (let i = 0; i < 20; i++) {
     try {
-      await page.goto('http://localhost:8080', { timeout: 5000 });
+      await page.goto(env.baseURL, { timeout: 5000 });
       ready = true;
       break;
     } catch {
@@ -67,16 +67,16 @@ async function globalSetup() {
 
   // 8) 관리자 계정 생성 - 민감 정보는 env로 분리
   try {
-    await page.getByPlaceholder('First Name').fill(process.env.ADMIN_FIRST_NAME || 'ahn');
+    await page.getByPlaceholder('First Name').fill(env.adminFirstName || 'ahn');
   } catch (e) {
     await page.screenshot({ path: 'installer-failure.png', fullPage: true });
     throw e;
   }
-  await page.getByPlaceholder('Last Name').fill(process.env.ADMIN_LAST_NAME || 'intaek');
-  await page.getByRole('textbox').nth(2).fill(process.env.ADMIN_EMAIL!);
-  await page.getByRole('textbox').nth(4).fill(process.env.ADMIN_ID!);
-  await page.getByRole('textbox').nth(5).fill(process.env.ADMIN_PW!);
-  await page.locator('input[type="password"]').nth(1).fill(process.env.ADMIN_PW!);
+  await page.getByPlaceholder('Last Name').fill(env.adminLastName || 'intaek');
+  await page.getByRole('textbox').nth(2).fill(env.adminEmail);
+  await page.getByRole('textbox').nth(4).fill(env.adminId);
+  await page.getByRole('textbox').nth(5).fill(env.adminPw);
+  await page.locator('input[type="password"]').nth(1).fill(env.adminPw);
   await goToNextInstallerStep(page);
 
   // 9) 설치 실행 - 여기서 실제 DB 마이그레이션이 진행되므로 넉넉한 타임아웃 필요
@@ -95,7 +95,7 @@ async function globalSetup() {
   const jobSettingsPage = new JobSettingsPage(page);
 
   await loginPage.goto();
-  await loginPage.login(process.env.ADMIN_ID!, process.env.ADMIN_PW!);
+  await loginPage.login(env.adminId!, env.adminPw!);
   await jobSettingsPage.goto();
 
   // 1) Job Title 시딩 (기존)

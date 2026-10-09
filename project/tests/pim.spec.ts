@@ -1,5 +1,5 @@
 import { test } from '../fixtures/authedPage.fixture';
-import 'dotenv/config';
+import { env } from '../utils/env';
 import { PimPage } from '../pages/pimPage';
 import { EmployeeInfo } from "../models/employee";
 import { PROFILE_IMAGE_PATH } from '../testData/filePaths';
@@ -28,7 +28,7 @@ await pimPage.fillBasicInfo(employee);
   console.log('Employee Number:', employeeNum);
 
   await pimPage.enableLoginDetails();
-  await pimPage.fillLoginCredentials(`user_taek_${uniqueSuffix}`, process.env.ADMIN_PW!);
+  await pimPage.fillLoginCredentials(`user_taek_${uniqueSuffix}`, env.adminPw!);
   await pimPage.selectEnabledStatus();
   await pimPage.saveNewEmployee();
 

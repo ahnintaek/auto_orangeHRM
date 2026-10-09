@@ -1,5 +1,4 @@
 import { test } from '../fixtures/authedPage.fixture';
-import 'dotenv/config';
 import { JobSettingsPage } from '../pages/jobSettingsPage';
 
 test('Job Title을 등록하고 수정한다', async ({ authedPage: page }) => {

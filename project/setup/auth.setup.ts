@@ -1,8 +1,6 @@
 import { test as setup } from '@playwright/test';
-import 'dotenv/config';
 import { LoginPage } from '../pages/loginPage';
-
-const ADMIN_AUTH_FILE = 'playwright/.auth/admin.json';
+import { ADMIN_AUTH_FILE } from '../utils/paths';
 
 setup('관리자로 로그인하고 인증 상태를 저장한다', async ({ page }) => {
   const loginPage = new LoginPage(page);

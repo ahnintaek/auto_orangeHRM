@@ -23,8 +23,8 @@ Docker로 격리한 자체 호스팅 환경에서, 설치부터 시드 데이터
 | `admin.spec.ts` | Admin | 시스템 유저 등록 → 목록 반영 확인 → 삭제 |
 | `pim.spec.ts` | PIM | 직원 등록 → 개인정보/연락처 저장 → 검색 → 삭제 |
 | `jobsetting.spec.ts` | Admin > Job | 직무 설정 관리 |
-| `login.spec.ts` | 인증 | 로그인 실패 등 네거티브 케이스 |
-| `api.spec.ts` | API | Playwright `APIRequestContext` 기반 API 검증 |
+| `login.spec.ts` | 인증 | 데이터 기반 5개 실패 케이스 + 로그인/로그아웃 |
+| `api.spec.ts` | API | 브라우저 세션 기반 fetch로 Job Titles 목록 조회 검증
 | `buzz.spec.ts` | Buzz | 게시글 작성/좋아요/댓글 CRUD |
 
 - 실행마다 유니크한 데이터(`Date.now()` 기반)를 사용해 재실행 시 충돌을 방지합니다.
@@ -130,7 +130,6 @@ npx playwright show-report
 - 시드 데이터(Job Title/Category)를 UI로 생성합니다. API 기반 시딩으로 바꾸면 더 빠르고 안정적입니다.
 - 환경 설정이 `local` 하나뿐이며, `global-setup.ts`의 접속 주소가 `playwright.config.ts`와 분리되어 있습니다.
 - 병렬 실행(`fullyParallel`) 시 공유 DB·단일 관리자 세션에 대한 격리 전략이 체계화되어 있지 않습니다.
-- 테스트 말미의 정리(cleanup)는 테스트가 중간에 실패하면 실행되지 않을 수 있습니다.
 - 린트/타입체크 게이트가 CI에 포함되어 있지 않습니다.
 
 ## 향후 개선 방향

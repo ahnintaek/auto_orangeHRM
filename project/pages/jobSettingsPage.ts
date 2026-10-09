@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import path from 'path';
 import { BasePage } from './basePage';
 import { JOB_SPEC_FILE_PATH } from '../testData/filePaths';

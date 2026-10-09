@@ -1,5 +1,4 @@
 import { test } from '../fixtures/authedPage.fixture';
-import 'dotenv/config';
 import { BuzzPage } from '../pages/buzzPage';
 
 test('Buzz Post 등록, 수정, 삭제 테스트', async ({ authedPage: page }) => {
