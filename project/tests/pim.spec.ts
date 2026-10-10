@@ -28,7 +28,7 @@ await pimPage.fillBasicInfo(employee);
   console.log('Employee Number:', employeeNum);
 
   await pimPage.enableLoginDetails();
-  await pimPage.fillLoginCredentials(`user_taek_${uniqueSuffix}`, env.adminPw!);
+  await pimPage.fillLoginCredentials(`user_taek_${uniqueSuffix}`, env.adminPw);
   await pimPage.selectEnabledStatus();
   await pimPage.saveNewEmployee();
 

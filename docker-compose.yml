@@ -1,6 +1,6 @@
 services:
   orangehrm:
-    image: orangehrm/orangehrm@sha256
+    image: orangehrm/orangehrm@sha256:d692780efbb118b1ede754cfb153057baecf4c4c5f84627621ed015cf837ac28
     container_name: orangehrm
     depends_on:
       db:

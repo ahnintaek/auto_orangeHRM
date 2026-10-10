@@ -1,26 +1,65 @@
-import { test } from '../fixtures/authedPage.fixture';
+import { test, expect } from '../fixtures/authedPage.fixture';
 import { BuzzPage } from '../pages/buzzPage';
 
-test('Buzz Post 등록, 수정, 삭제 테스트', async ({ authedPage: page }) => {
-      const buzzPage = new BuzzPage(page);
-    
-      const now = new Date();
-      const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
-      const uniqueSuffix = `${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
+test.describe('Buzz', () => {
+  let buzz: BuzzPage;
+  let postText = '';
+  let postCreated = false;
 
-      const postText = `Post Test, Date : ${timestamp} ${uniqueSuffix}`;
-      const commentText = `Comment Test : ${uniqueSuffix}`;
-      const editComment = `Edit Comment : ${uniqueSuffix}`;
-        
-      await buzzPage.goto();
+  test.afterEach(async () => {
+    if (!postCreated) return;
+    try {
+      await buzz.goto();
+      await buzz.deletePostIfExists(postText);
+    } catch (e) {
+      console.warn(`[cleanup 실패] ${postText}:`, e);
+      test.info().annotations.push({ type: 'cleanup-failed', description: postText });
+    }
+  });
 
-      await buzzPage.addPost(postText);
-      await buzzPage.likePost(postText);
+  test('게시글과 댓글의 등록, 수정, 삭제 흐름을 검증한다', async ({ authedPage: page }) => {
+    buzz = new BuzzPage(page);
+    postText = `Post ${Date.now()}`;
+    const comment = `Comment ${Date.now()}`;
+    const edited = `Edited ${Date.now()}`;
 
-      await buzzPage.commentOnPost(postText, commentText);
-      await buzzPage.likeComment(postText, commentText);
-      await buzzPage.editComment(postText, commentText, editComment);
-      await buzzPage.deleteComment(postText, editComment);
+    await buzz.goto();
 
-      await buzzPage.deletePost(postText);
+    await test.step('게시글을 등록한다', async () => {
+      postCreated = true;
+      await buzz.addPost(postText);
+    });
+
+    await test.step('게시글에 좋아요를 누르면 좋아요 수가 1이 된다', async () => {
+      await buzz.likePost(postText);
+      await expect(buzz.likeStat(postText)).toHaveText(/^1 Likes?$/);
+    });
+
+    await test.step('댓글을 등록하면 댓글 수가 1이 된다', async () => {
+      await buzz.commentOnPost(postText, comment);
+      await expect(buzz.commentStat(postText)).toHaveText(/^1 Comments?$/);
+    });
+
+    await test.step('댓글에 좋아요를 누르면 댓글 좋아요 수가 1이 된다', async () => {
+      await buzz.likeComment(postText, comment);
+      await expect(buzz.commentLikeStat(postText, comment)).toHaveText('1');
+    });
+
+    await test.step('댓글 수정 중 Esc를 누르면 원래 내용이 유지된다', async () => {
+      await buzz.cancelEditComment(postText, comment);
+    });
+
+    await test.step('댓글을 수정하면 새 내용이 표시된다', async () => {
+      await buzz.editComment(postText, comment, edited);
+    });
+
+    await test.step('댓글을 삭제하면 목록에서 사라진다', async () => {
+      await buzz.deleteComment(postText, edited);
+    });
+
+    await test.step('게시글을 삭제하면 피드에서 사라진다', async () => {
+      await buzz.deletePost(postText);
+      postCreated = false;
+    });
+  });
 });

@@ -14,7 +14,7 @@ test('관리자가 신규 시스템 유저를 등록하고 목록에서 확인�
   await adminPage.selectUserRole(USER_ROLE_ADMIN);
   await adminPage.searchEmployee(employeeName);
   await adminPage.selectStatus(STATUS_ENABLED);
-  await adminPage.fillCredentials(userName, env.adminPw!);
+  await adminPage.fillCredentials(userName, env.adminPw);
   await adminPage.save();
   cleanup.add(`user ${userName}`, () => adminPage.deleteUserByName(userName));
 

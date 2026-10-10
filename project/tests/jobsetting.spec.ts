@@ -1,7 +1,7 @@
 import { test } from '../fixtures/authedPage.fixture';
 import { JobSettingsPage } from '../pages/jobSettingsPage';
 
-test('Job Title을 등록하고 수정한다', async ({ authedPage: page }) => {
+test('Job 을 Setting한다', async ({ authedPage: page }) => {
   const jobSettingsPage = new JobSettingsPage(page);
   const uniqueSuffix = Date.now();
 
@@ -12,10 +12,15 @@ test('Job Title을 등록하고 수정한다', async ({ authedPage: page }) => {
   };
 
   await jobSettingsPage.goto();
-  await jobSettingsPage.gotoJobTitles();
-  await jobSettingsPage.addJobDetails(jobDetails);
-  await jobSettingsPage.modifyJobDetails(jobDetails);
+
+  await test.step('Job Title을 등록, 수정한다', async () => {
+    await jobSettingsPage.gotoJobTitles();
+    await jobSettingsPage.addJobDetails(jobDetails);
+    await jobSettingsPage.modifyJobDetails(jobDetails);
+  });
   
-  await jobSettingsPage.gotoJobCategories();
-  await jobSettingsPage.addJobCategory(`test_category_${uniqueSuffix}`);
+  await test.step('Job Category를 등록한다', async () => {
+    await jobSettingsPage.gotoJobCategories();
+    await jobSettingsPage.addJobCategory(`test_category_${uniqueSuffix}`);
+  });
 });
