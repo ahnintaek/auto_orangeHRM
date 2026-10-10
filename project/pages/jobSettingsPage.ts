@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { expect, Locator } from '@playwright/test';
 import path from 'path';
 import { BasePage } from './basePage';
 import { JOB_SPEC_FILE_PATH } from '../testData/filePaths';
@@ -60,5 +60,19 @@ export class JobSettingsPage extends BasePage {
     await this.fillAndVerify(this.getFieldInput('Name'), categoryName);
     await this.page.getByRole('button', { name: 'Save' }).click();
     await this.waitForPageLoad();
+  }
+
+  // 검증 오류 케이스용: 등록 폼에서 저장을 "시도"만 한다. 이름이 비어 있으면 입력하지 않는다.
+  async submitJobTitle(name: string) {
+    await this.addBtn();
+    if (name) {
+      await this.fillAndVerify(this.getFieldInput('Job Title'), name);
+    }
+    await this.save();
+  }
+
+  // Job Title 입력칸 아래에 표시되는 오류 문구 ("Required", "Already exists" 등)
+  jobTitleError(): Locator {
+    return this.getInputGroup('Job Title').locator('.oxd-input-field-error-message');
   }
 }

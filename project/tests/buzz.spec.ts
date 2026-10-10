@@ -1,5 +1,6 @@
 import { test, expect } from '../fixtures/authedPage.fixture';
 import { BuzzPage } from '../pages/buzzPage';
+import { uniqueId } from '../utils/unique';
 
 test.describe('Buzz', () => {
   let buzz: BuzzPage;
@@ -19,9 +20,9 @@ test.describe('Buzz', () => {
 
   test('게시글과 댓글의 등록, 수정, 삭제 흐름을 검증한다', async ({ authedPage: page }) => {
     buzz = new BuzzPage(page);
-    postText = `Post ${Date.now()}`;
-    const comment = `Comment ${Date.now()}`;
-    const edited = `Edited ${Date.now()}`;
+    postText = `Post ${uniqueId()}`;
+    const comment = `Comment ${uniqueId()}`;
+    const edited = `Edited ${uniqueId()}`;
 
     await buzz.goto();
 
