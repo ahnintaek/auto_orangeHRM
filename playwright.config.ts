@@ -1,24 +1,14 @@
 import { defineConfig } from '@playwright/test';
-import dotenv from 'dotenv';
-import path from 'path';
-
-dotenv.config({ path: path.resolve(__dirname, '.env') });
-
-const ENV_BASE_URLS: Record<string, string> = {
-  local: 'http://localhost:8080',
-};
-const TEST_ENV = process.env.TEST_ENV ?? 'local';
-const baseURL = ENV_BASE_URLS[TEST_ENV] ?? ENV_BASE_URLS.local;
-
-const ADMIN_AUTH_FILE = 'playwright/.auth/admin.json';
+import { env } from './project/utils/env';
+import { ADMIN_AUTH_FILE } from './project/utils/paths';
 
 export default defineConfig({
   globalSetup: require.resolve('./global-setup.ts'),
   testDir: './project/tests',
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  forbidOnly: env.isCI,
+  retries: env.isCI ? 2 : 0,
+  workers: env.isCI ? 2 : undefined,
   reporter: [
     ['list'],
     ['html', {
@@ -29,7 +19,7 @@ export default defineConfig({
   ],
 
   use: {
-    baseURL,
+    baseURL : env.baseURL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
@@ -51,10 +41,10 @@ export default defineConfig({
       testMatch: /.*\.setup\.ts/,
       use: {
         browserName: 'chromium',
-        viewport: process.env.CI ? { width: 1920, height: 1080 } : null,
+        viewport: env.isCI ? { width: 1920, height: 1080 } : null,
         launchOptions: {
-          headless: !!process.env.CI,
-          args: process.env.CI ? [] : ['--start-maximized'],
+          headless: env.isCI,
+          args: env.isCI ? [] : ['--start-maximized'],
         },
       },
     },
@@ -63,10 +53,10 @@ export default defineConfig({
       testDir: './project/tests',
       use: {
         browserName: 'chromium',
-        viewport: process.env.CI ? { width: 1920, height: 1080 } : null,
+        viewport: env.isCI ? { width: 1920, height: 1080 } : null,
         launchOptions: {
-          headless: !!process.env.CI, // CI에서는 true, 로컬에서는 false
-          args: process.env.CI ? [] : ['--start-maximized'],
+          headless: env.isCI, // CI에서는 true, 로컬에서는 false
+          args: env.isCI ? [] : ['--start-maximized'],
         },
         storageState: ADMIN_AUTH_FILE, 
       },

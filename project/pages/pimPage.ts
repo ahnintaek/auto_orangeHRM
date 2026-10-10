@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { BasePage } from './basePage';
 import { EmployeeInfo } from "../models/employee";
 import { STATUS_ENABLED } from '../testData/seedData';

@@ -7,6 +7,10 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+# 기본 권한은 "읽기". 쓰기가 필요한 deploy 잡만 아래에서 따로 올려준다.
+permissions:
+  contents: read
+
 jobs:
   test:
     uses: ./.github/workflows/run-tests.yml
@@ -14,21 +18,32 @@ jobs:
 
   deploy:
     needs: test
-    if: always() && github.ref == 'refs/heads/main'
+    # 테스트가 실패해도 실패 리포트는 올리되, 사용자가 취소한 실행은 배포하지 않는다.
+    # (always()는 취소된 실행에서도 true라서 !cancelled()로 바꿈)
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    # 연속으로 push해도 배포가 동시에 gh-pages 브랜치를 쓰지 않도록 한 줄로 세움
+    concurrency:
+      group: gh-pages-deploy
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
 
       - name: Download report artifact
+        id: download
+        continue-on-error: true   # 서버 기동 실패 등으로 리포트가 없으면 배포만 건너뛰고, 원래 실패(test)만 보이게 함
         uses: actions/download-artifact@v4
         with:
-          name: playwright-artifacts
+          name: playwright-report
           path: playwright-report
 
       - name: Deploy report to GitHub Pages
+        if: steps.download.outcome == 'success'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./playwright-report
+          destination_dir: playwright-report   # 기존 주소(.../playwright-report/)를 그대로 유지
+          force_orphan: true                   # gh-pages를 새로 만들어, 이미 공개된 test-results 파일을 제거

@@ -1,13 +1,12 @@
-version: '3.8'
 services:
   orangehrm:
-    image: orangehrm/orangehrm:latest
+    image: orangehrm/orangehrm@sha256:d692780efbb118b1ede754cfb153057baecf4c4c5f84627621ed015cf837ac28
     container_name: orangehrm
-    restart: unless-stopped
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     environment:
       - ORANGEHRM_DATABASE_HOST=db
       - ORANGEHRM_DATABASE_USER=orangehrm
@@ -16,12 +15,16 @@ services:
   db:
     image: mariadb:10.6
     container_name: orangehrm-db
-    restart: unless-stopped
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_USER=orangehrm
       - MYSQL_PASSWORD=orangehrm
       - MYSQL_DATABASE=orangehrm
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     volumes:
       - orangehrm_db_data:/var/lib/mysql
 volumes:
