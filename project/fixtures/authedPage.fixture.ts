@@ -25,6 +25,8 @@ class CleanupRegistry {
 export const test = base.extend<{
   authedPage: Page;
   cleanup: CleanupRegistry;
+  apiCleanup: CleanupRegistry;
+  
 }>({
   authedPage: async ({ page }, use) => {
     await page.goto('/web/index.php/dashboard/index');
@@ -32,6 +34,12 @@ export const test = base.extend<{
   },
 
   cleanup: async ({ authedPage }, use) => {
+    const registry = new CleanupRegistry();
+    await use(registry);
+    await registry.runAll();
+  },
+
+  apiCleanup: async ({ request }, use) => {
     const registry = new CleanupRegistry();
     await use(registry);
     await registry.runAll();

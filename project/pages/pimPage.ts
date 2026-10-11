@@ -193,4 +193,18 @@ export class PimPage extends BasePage {
     await this.page.getByRole('button', { name: 'Yes, Delete' }).click();
     await expect(this.page.getByText(employeeNum)).not.toBeVisible();
   }
+
+  async deleteEmployeeIfExists(employeeId: string) {
+    await this.goto();
+    await this.searchEmployee(employeeId);
+    const row = this.page.locator('.oxd-table-row').filter({
+      has: this.page.locator(`div:text-is("${employeeId}")`),
+    });
+    const exists = await row
+      .first()
+      .waitFor({ state: 'attached', timeout: 5000 })
+      .then(() => true, () => false);
+    if (!exists) return;
+    await this.deleteEmployee(employeeId);
+  }
 }

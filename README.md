@@ -22,9 +22,9 @@ Docker로 격리한 자체 호스팅 환경에서, 설치부터 시드 데이터
 |---|---|---|
 | `admin.spec.ts` | Admin | 시스템 유저 등록 → 목록 반영 확인 (정리는 cleanup fixture가 수행) |
 | `pim.spec.ts` | PIM | 직원 등록 → 개인정보/연락처 저장 → 검색 → 삭제 |
-| `jobsetting.spec.ts` | Admin > Job | 직무 설정 관리 |
+| `jobsetting.spec.ts` | Admin > Job | Job Title 등록·수정(UI) 후 저장 내용을 API로 확인, Job Category 등록, 중복(Already exists)/빈 값(Required) 오류 표시 |
 | `login.spec.ts` | 인증 | 데이터 기반 실패 케이스 5종(빈 값 3종, 잘못된 비밀번호, 존재하지 않는 아이디) + 로그인/로그아웃 |
-| `api.spec.ts` | API | 브라우저 세션으로 Job Titles 목록 API를 호출해 시드 데이터 포함 여부 검증 |
+| `api.spec.ts` | API | Job Titles API를 브라우저 없이 request로 검증: 목록 응답 구조와 시드 포함, 인증 없는 호출 401, 생성 → 조회 → 수정 → 삭제 생명주기, 빈 이름/중복 이름 거절 |
 | `buzz.spec.ts` | Buzz | 게시글 등록 → 좋아요(수 검증) → 댓글 등록(수 검증) → 댓글 좋아요(수 검증) → 수정 중 Esc 취소 → 댓글 수정 → 댓글 삭제 → 게시글 삭제 |
 
 - 실행마다 유니크한 데이터를 사용해 재실행 시 충돌을 방지합니다.
@@ -34,7 +34,8 @@ Docker로 격리한 자체 호스팅 환경에서, 설치부터 시드 데이터
 
 ```
 project/
-├── fixtures/authedPage.fixture.ts   # 인증된 page 주입 + 실패해도 실행되는 cleanup 등록기
+├── fixtures/authedPage.fixture.ts   # authedPage + cleanup(UI 정리) + apiCleanup(API 정리, 브라우저 없이)
+├── api/jobApi.ts                    # Job Title API 헬퍼 (데이터 생성/정리/검증에 사용)
 ├── models/employee.ts
 ├── pages/
 │   ├── basePage.ts                  # 공통 폼 입력/검증/네비게이션 유틸
@@ -67,6 +68,10 @@ docker-compose.yml
 - **대기 전략**: 고정 대기 대신 상태/응답 기반 대기를 사용합니다. 폼 로더가 사라지길 기다리고, 등록 API는 요청 응답(`waitForResponse`)을 기다리며, 클릭이 상태 전환으로 이어지지 않을 수 있는 구간은 상태를 확인하며 재시도(`toPass`)합니다.
 - **텍스트는 정확 일치로 찾음**: `hasText` 문자열은 부분 일치라 누적 데이터와 겹칠 수 있어, 앞뒤를 고정한 정규식으로 전체 일치를 사용합니다.
 - **멱등한 시드**: `global-setup.ts`는 이미 설치/시드된 상태면 해당 단계를 건너뜁니다.
+- **UI + API 하이브리드**: 사용자 동작은 UI로 검증하고, 테스트의 사전조건 생성(이미 존재하는 직무)과 정리는 API로, 저장 결과 확인은 API로 수행합니다. 화면 조작을 줄여 빠르고 덜 깨지며, 화면 입력과 서버 저장이 모두 맞는지 확인합니다.
+- **정리 fixture 두 종류**: 같은 CleanupRegistry를 쓰되, 화면으로 정리하는 cleanup(브라우저 필요)과 API로 정리하는 apiCleanup(브라우저를 열지 않음)을 구분합니다. 정리 대상은 만들기 전에 등록하고, 이름이 정확히 일치하는 항목만 지우며, 이미 없으면 아무것도 하지 않습니다(멱등).
+- **API 요청은 화면이 보내는 요청을 기준으로 작성**: DevTools로 실제 요청(URL, 메서드, Payload)을 확인해 맞춥니다. 요청이 실패하면 상태 코드와 응답 본문을 에러 메시지에 담아 원인을 바로 알 수 있게 합니다.
+- **정적 타입 검사**: tsc --noEmit이 fixture 이름 불일치 같은 실수를 실행 전에 발견합니다.
 
 ## 실행 방법
 
@@ -100,8 +105,9 @@ docker compose down -v
 - Docker Compose로 OrangeHRM + MariaDB를 완전히 빈 상태로 기동하고, 컨테이너 응답을 폴링으로 확인한 뒤 `globalSetup`이 설치 마법사를 자동 완료합니다.
 - 관리자 계정 정보는 GitHub Secrets로 주입하고, 로컬은 `.env`(gitignore)를 사용합니다.
 - CI 설정: `retries: 2`, `workers: 2`, 뷰포트 1920x1080 고정, headless 실행.
-- 실패 시 스크린샷/비디오/트레이스(`on-first-retry`)를 아티팩트로 업로드합니다.
-- `main` 브랜치에서는 HTML 리포트를 GitHub Pages에 게시합니다(실행마다 덮어쓰기).
+- 아티팩트는 용도별로 분리합니다. 공개용 HTML 리포트(`playwright-report`, 30일)와 디버깅용 `test-results`(trace/비디오/스크린샷, 7일)를 따로 업로드하며, **GitHub Pages에는 HTML 리포트만 게시**합니다.
+- `main` 브랜치에서만 리포트를 게시합니다. 테스트가 실패해도 실패 리포트는 게시하되, 사용자가 취소한 실행은 배포하지 않습니다(`!cancelled()`). 리포트가 없는 실패(서버 기동 실패 등)에서는 배포를 건너뛰어 원래 실패만 보이게 합니다.
+- 워크플로 기본 권한은 읽기 전용이고, 쓰기 권한은 배포 잡에만 부여합니다. 배포는 `concurrency`로 순차 실행해 `gh-pages` 충돌을 막습니다.
 
 ## 트러블슈팅
 
@@ -155,6 +161,22 @@ docker compose down -v
 - **해결**: 등록 요청(`POST /api/v2/buzz/posts`)의 응답을 클릭과 함께 대기하고 상태 코드를 검증. 실패 시 "화면에서 게시글을 못 찾음"이 아니라 API 실패 코드가 바로 보임
 - **결과**: 31개 테스트 실행 시간 5.5분 → 5.2분 (전체 통과 유지)
 
+### 11. 비인증 API 호출이 200으로 응답
+- **문제**: 로그인 없이 호출하는 테스트가 401이 아니라 200과 전체 직무 목록을 받음
+- **원인(판단)**: Playwright Test는 설정의 로그인 세션(storageState)을 request.newContext()에도 기본값으로 적용해, "새 컨텍스트"도 로그인 쿠키를 가짐
+- **해결**: 빈 storageState를 명시해 쿠키 없는 컨텍스트로 호출하고, 401을 확인
+- **교훈**: "새로 만든 컨텍스트는 깨끗하다"는 가정도 검증 대상
+
+### 12. 추정한 API 본문을 서버가 거절 (422)
+- **문제**: 직무 수정 API가 422 Invalid Parameter로 실패하고, 응답이 currentAttachment를 잘못된 키로 지목
+- **원인**: 다른 버전의 관례를 근거로 추정한 필드(currentAttachment, specification)를 보냄
+- **해결**: 화면에서 수정을 저장할 때 나가는 요청을 DevTools로 캡처해 본문을 title, description, note 세 필드로 일치시킴. 실패 시 상태 코드와 본문을 에러에 담는 ensureOk로 원인 파악 시간을 줄임
+- **교훈**: API 요청은 추정하지 않고 실제 화면이 보내는 요청을 기준으로 작성
+### 13. 타입 검사가 실행 전에 발견한 fixture 불일치
+- **문제**: 새 fixture(apiCleanup)를 본문에서 쓰면서 테스트 함수의 인자 선언을 맞추지 않음
+- **발견**: tsc --noEmit이 Cannot find name 'apiCleanup'으로 즉시 지적. 테스트를 돌리기 전에 수정
+- **교훈**: 타입 검사는 대규모 변경 후 이름 불일치를 한 번에 잡아주는 안전장치
+
 ## 테스트 중 발견한 이슈
 
 - **Buzz 접근성**: 좋아요/댓글 버튼이 아이콘만 있고 접근 가능한 이름(accessible name)이 없음. 댓글의 Like/Edit/Delete는 `<p>` 요소로 구현되어 버튼 역할이 없고, 댓글 편집 입력창에는 라벨이나 placeholder가 없음
@@ -162,18 +184,18 @@ docker compose down -v
 ## 알려진 한계
 
 - 브라우저는 Chromium만 사용하며, 모바일 뷰포트는 검증하지 않습니다.
-- API 테스트는 브라우저 세션을 이용한 단일 조회 1건이며, 생성 → 조회 → 삭제 CRUD는 아직 없습니다.
-- 시드 데이터(Job Title/Category)를 UI로 생성합니다. API 기반 시딩이 더 빠르고 안정적입니다.
 - 모듈 이동 시 공통 폼 로더 대기가 로더가 없는 화면에서는 최대 3초를 소비합니다. 모듈별로 응답/상태 기반 대기로 교체할 예정입니다.
 - `global-setup.ts`에는 인덱스 기반 로케이터와 고정 대기 루프가 남아 있습니다.
-- Docker 이미지가 `latest` 태그라 업스트림 변경에 영향을 받을 수 있습니다.
 - 병렬 실행(`fullyParallel`) 시 공유 DB·단일 관리자 세션에 대한 격리 전략이 체계화되어 있지 않습니다. 현재는 유니크 데이터와 이름 지정 정리로 충돌을 피합니다.
-- 린트/타입체크 게이트가 CI에 포함되어 있지 않습니다.
+- API 테스트는 Job Titles에 한정되며, Admin Users·Buzz 등 다른 리소스는 아직 UI 중심입니다.
+- Job Category는 API 요청을 확인하지 않아 정리와 서버 저장 검증이 없습니다.
+- 빈 이름/중복 이름 거절은 400 또는 422를 허용하며, 정확한 코드를 단언하지 않았습니다.
+- 이름 지정 정리는 목록을 최대 100건까지 조회하므로, 그 이상 쌓인 로컬 DB에서는 대상을 못 찾을 수 있습니다(docker compose down -v로 초기화).
 
 ## 향후 개선 방향
 
 - `tsconfig` 정비와 `tsc --noEmit`, ESLint/Prettier CI 게이트
-- API 테스트 확장: `APIRequestContext` 기반 생성 → 조회 → 삭제 CRUD, 스키마 검증, 인증 없는 요청(401) 케이스. 사전조건 생성/정리를 API로 전환
+- API 테스트 확장: 다른 리소스(Admin Users, Buzz, Job Category)로 확대하고, 사전조건 생성/정리를 API로 전환. 거절 케이스의 상태 코드를 확정해 단언 강화.
 - axe-core 기반 접근성 자동 검증 (Buzz에서 발견한 이슈를 회귀 테스트로 고정)
 - `TESTING_STRATEGY.md`: 자동화 대상 선정 기준, 위험 기반 우선순위, smoke/regression 분리
 - 모듈 공통 대기 개선과 `global-setup.ts` 정리(셀렉터, 고정 대기)

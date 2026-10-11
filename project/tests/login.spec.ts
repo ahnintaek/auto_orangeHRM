@@ -40,7 +40,7 @@ test.describe('로그인 실패 검증', () => {
 });
 
 test.describe('로그인 성공 및 로그아웃', () => {
-  test('올바른 자격증명으로 로그인하고, 로그아웃하면 로그인 화면으로 돌아간다', async ({ page }) => {
+  test('정상 로그인', async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.loginAsAdmin();
     await page.waitForURL('**/dashboard/**');
