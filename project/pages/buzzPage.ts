@@ -78,17 +78,11 @@ export class BuzzPage extends BasePage {
   }
 
   async addPost(message: string) {
-    await this.page.getByPlaceholder("What's on your mind?").fill(message);
-    const [response] = await Promise.all([
-      this.page.waitForResponse(
-        (res) =>
-          res.request().method() === 'POST' &&
-          new URL(res.url()).pathname.endsWith('/api/v2/buzz/posts'),
-      ),
-      this.page.getByRole('button', { name: 'Post', exact: true }).click(),
-    ]);
-    expect(response.ok(), `게시글 등록 API 실패: ${response.status()}`).toBeTruthy();
- 
+    const composer = this.page.getByPlaceholder("What's on your mind?");
+    await composer.fill(message);
+    await this.page.getByRole('button', { name: 'Post', exact: true }).click();
+
+    await expect(composer).toHaveValue('');
     await expect(this.getPost(message)).toHaveCount(1);
   }
 

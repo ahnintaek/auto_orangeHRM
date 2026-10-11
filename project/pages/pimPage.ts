@@ -181,17 +181,18 @@ export class PimPage extends BasePage {
     await this.page.waitForSelector('.oxd-table-loader', { state: 'hidden' });
   }
 
-  async deleteEmployee(employeeNum: string) {
+  async deleteEmployee(employeeId: string) {
     await this.waitForPageLoad();
     const row = this.page.locator('.oxd-table-row').filter({
-      has: this.page.locator(`div:text-is("${employeeNum}")`)
+      has: this.page.locator(`div:text-is("${employeeId}")`),
     });
-  
     await expect(row).toHaveCount(1);
-  
+
     await row.locator('button:has(.bi-trash)').click();
     await this.page.getByRole('button', { name: 'Yes, Delete' }).click();
-    await expect(this.page.getByText(employeeNum)).not.toBeVisible();
+
+    await expect(this.page.getByText('Successfully Deleted')).toBeVisible();
+    await expect(row).toHaveCount(0);
   }
 
   async deleteEmployeeIfExists(employeeId: string) {

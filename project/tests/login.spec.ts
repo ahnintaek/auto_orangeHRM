@@ -26,14 +26,11 @@ test.describe('로그인 실패 검증', () => {
       await loginPage.login(c.username, c.password);
 
       if (c.expectedError === 'required') {
-        // 클라이언트 사이드 검증: 페이지 이동 없이 즉시 노출
         await expect(loginPage.requiredErrors.first()).toBeVisible();
       } else {
-        // 서버 응답 기반 검증: 요청 후 alert 노출까지 자동 대기
         await expect(loginPage.invalidCredentialsError).toBeVisible();
       }
 
-      // 공통: 실패했으므로 로그인 화면에 그대로 남아있어야 함
       await expect(page).toHaveURL(/auth\/login/);
     });
   }

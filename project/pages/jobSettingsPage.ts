@@ -62,7 +62,6 @@ export class JobSettingsPage extends BasePage {
     await this.waitForPageLoad();
   }
 
-  // 검증 오류 케이스용: 등록 폼에서 저장을 "시도"만 한다. 이름이 비어 있으면 입력하지 않는다.
   async submitJobTitle(name: string) {
     await this.addBtn();
     if (name) {
@@ -71,8 +70,25 @@ export class JobSettingsPage extends BasePage {
     await this.save();
   }
 
-  // Job Title 입력칸 아래에 표시되는 오류 문구 ("Required", "Already exists" 등)
   jobTitleError(): Locator {
     return this.getInputGroup('Job Title').locator('.oxd-input-field-error-message');
+  }
+
+  async expectJobDetails(jobDetails: JobDetails) {
+    const row = this.page.locator('.oxd-table-row').filter({
+      has: this.page.locator(`div:text-is("${jobDetails.jobName}")`),
+    });
+    await expect(row).toHaveCount(1);
+    await row.locator('button:has(.bi-pencil-fill)').click();
+    await this.waitForPageLoad();
+    await expect(this.getFieldTextArea('Job Description')).toHaveValue(jobDetails.jobDescription);
+    await expect(this.getFieldTextArea('Note')).toHaveValue(jobDetails.jobNote);
+  }
+ 
+  async expectJobCategoryListed(categoryName: string) {
+    const row = this.page.locator('.oxd-table-row').filter({
+      has: this.page.locator(`div:text-is("${categoryName}")`),
+    });
+    await expect(row).toHaveCount(1);
   }
 }
