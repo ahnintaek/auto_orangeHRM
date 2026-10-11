@@ -79,8 +79,8 @@ test.describe('Job Titles API', () => {
     const res = await request.post(JOB_TITLES, {
       data: { title: '', description: '', specification: null, note: '' },
     });
-    // TODO(확인): 거절 상태 코드. 400 또는 422를 허용하고, 실제 값은 실패 메시지로 확인한다.
-    expect([400, 422], `응답: ${res.status()} ${await res.text()}`).toContain(res.status());
+    expect(res.status(), `응답: ${res.status()} ${await res.text()}`).toBe(422);
+    expect((await res.json()).error.data.invalidParamKeys).toContain('title');
   });
 
   test('같은 이름으로 생성하면 거절되고 한 건만 남는다', async ({ request, apiCleanup }) => {
@@ -91,7 +91,8 @@ test.describe('Job Titles API', () => {
     const res = await request.post(JOB_TITLES, {
       data: { title, description: '', specification: null, note: '' },
     });
-    expect([400, 422], `응답: ${res.status()} ${await res.text()}`).toContain(res.status());
+    expect(res.status(), `응답: ...`).toBe(422);
+    expect((await res.json()).error.data.invalidParamKeys).toContain('title');
 
     const sameName = (await listJobTitles(request)).filter((job) => job.title === title);
     expect(sameName).toHaveLength(1);
