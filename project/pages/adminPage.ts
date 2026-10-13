@@ -1,10 +1,9 @@
-import { expect } from '@playwright/test';
-import { BasePage } from './basePage';
+import { expect } from "@playwright/test";
+import { BasePage } from "./basePage";
 
 export class AdminPage extends BasePage {
-
   async goto() {
-    await this.gotoModule('Admin');
+    await this.gotoModule("Admin");
   }
 
   async openAddUserForm() {
@@ -12,52 +11,56 @@ export class AdminPage extends BasePage {
   }
 
   async selectUserRole(role: string) {
-    await this.page.getByText('-- Select --').first().click();
-    await this.page.getByRole('option', { name: role }).click();
+    await this.page.getByText("-- Select --").first().click();
+    await this.page.getByRole("option", { name: role }).click();
   }
 
   async searchEmployee(employeeName: string) {
-    const input = this.page.getByRole('textbox', { name: 'Type for hints...' });
+    const input = this.page.getByRole("textbox", { name: "Type for hints..." });
     await input.fill(employeeName);
-    await expect(this.page.getByRole('option', { name: 'Searching....' })).toBeHidden({ timeout: 10000 });
+    await expect(
+      this.page.getByRole("option", { name: "Searching...." }),
+    ).toBeHidden({ timeout: 10000 });
 
-    const lastName = employeeName.split(' ').pop()!;
-    const option = this.page.getByRole('option').filter({ hasText: lastName });
+    const lastName = employeeName.split(" ").pop()!;
+    const option = this.page.getByRole("option").filter({ hasText: lastName });
     await expect(option).toBeVisible({ timeout: 10000 });
     await option.click();
   }
 
   async selectStatus(status: string) {
-    await this.page.getByText('-- Select --').click();
-    await this.page.getByRole('option', { name: status }).click();
+    await this.page.getByText("-- Select --").click();
+    await this.page.getByRole("option", { name: status }).click();
   }
 
   async fillCredentials(username: string, password: string) {
-    await this.getFieldInput('Username').fill(username);
+    await this.getFieldInput("Username").fill(username);
     await this.getFieldInput(/^Password$/).fill(password);
-    await this.getFieldInput('Confirm Password').fill(password);
+    await this.getFieldInput("Confirm Password").fill(password);
   }
 
   override async save() {
     await super.save();
-    await this.page.waitForURL('**/admin/viewSystemUsers**');
+    await this.page.waitForURL("**/admin/viewSystemUsers**");
   }
 
   async assertUserListVisible() {
-    await expect(this.page.getByRole('heading', { name: 'System Users' })).toBeVisible();
+    await expect(
+      this.page.getByRole("heading", { name: "System Users" }),
+    ).toBeVisible();
   }
 
   userRow(username: string) {
-    return this.page.locator('.oxd-table-card').filter({
+    return this.page.locator(".oxd-table-card").filter({
       has: this.page.getByText(username, { exact: true }),
     });
   }
-  
+
   async deleteUserByName(username: string) {
     await this.waitForPageLoad();
     const row = this.userRow(username);
-    await row.locator('.oxd-icon.bi-trash').click();
-    await this.page.getByRole('button', { name: 'Yes, Delete' }).click();
+    await row.locator(".oxd-icon.bi-trash").click();
+    await this.page.getByRole("button", { name: "Yes, Delete" }).click();
     await expect(row).toHaveCount(0);
   }
 }

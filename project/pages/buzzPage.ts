@@ -1,62 +1,75 @@
-import { expect, Locator } from '@playwright/test';
-import { BasePage } from './basePage';
+import { expect, Locator } from "@playwright/test";
+import { BasePage } from "./basePage";
 
 const exactText = (text: string) =>
-  new RegExp(`^\\s*${text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`);
+  new RegExp(`^\\s*${text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`);
 
-type CommentAction = 'Like' | 'Edit' | 'Delete';
+type CommentAction = "Like" | "Edit" | "Delete";
 
 export class BuzzPage extends BasePage {
-
   getPost(message: string): Locator {
-    return this.page.locator('.orangehrm-buzz').filter({
-      has: this.page.locator('.orangehrm-buzz-post-body-text', { hasText: exactText(message) }),
+    return this.page.locator(".orangehrm-buzz").filter({
+      has: this.page.locator(".orangehrm-buzz-post-body-text", {
+        hasText: exactText(message),
+      }),
     });
   }
 
   likeStat(message: string): Locator {
-    return this.getPost(message).locator('.orangehrm-buzz-stats-active', { hasText: /Likes?$/ });
+    return this.getPost(message).locator(".orangehrm-buzz-stats-active", {
+      hasText: /Likes?$/,
+    });
   }
 
   commentStat(message: string): Locator {
-    return this.getPost(message).locator('.orangehrm-buzz-stats-active', { hasText: /Comments?$/ });
+    return this.getPost(message).locator(".orangehrm-buzz-stats-active", {
+      hasText: /Comments?$/,
+    });
   }
 
   getComment(post: Locator, comment: string): Locator {
-    return post.locator('.orangehrm-post-comment').filter({
-      has: this.page.locator('.orangehrm-post-comment-text', { hasText: exactText(comment) }),
+    return post.locator(".orangehrm-post-comment").filter({
+      has: this.page.locator(".orangehrm-post-comment-text", {
+        hasText: exactText(comment),
+      }),
     });
   }
 
   commentLikeStat(message: string, comment: string): Locator {
     return this.getPost(message)
-      .locator('.orangehrm-comment-wrapper')
+      .locator(".orangehrm-comment-wrapper")
       .filter({
-        has: this.page.locator('.orangehrm-post-comment-text', { hasText: exactText(comment) }),
+        has: this.page.locator(".orangehrm-post-comment-text", {
+          hasText: exactText(comment),
+        }),
       })
-      .locator('.orangehrm-post-comment-stats-text');
+      .locator(".orangehrm-post-comment-stats-text");
   }
 
   private getEditingComment(post: Locator): Locator {
-    return post.locator('.orangehrm-post-comment').filter({
-      has: this.page.locator('form input.oxd-input'),
+    return post.locator(".orangehrm-post-comment").filter({
+      has: this.page.locator("form input.oxd-input"),
     });
   }
 
   private commentAction(item: Locator, name: CommentAction): Locator {
-    return item.locator('.orangehrm-post-comment-action', { hasText: new RegExp(`^${name}$`) });
+    return item.locator(".orangehrm-post-comment-action", {
+      hasText: new RegExp(`^${name}$`),
+    });
   }
 
   private getCommentButton(post: Locator): Locator {
-    return post.locator('button', { has: this.page.locator('.bi-chat-text-fill') });
+    return post.locator("button", {
+      has: this.page.locator(".bi-chat-text-fill"),
+    });
   }
 
   private getCommentArea(post: Locator): Locator {
-    return post.locator('.orangehrm-buzz-comment');
+    return post.locator(".orangehrm-buzz-comment");
   }
 
   private getCommentInput(post: Locator): Locator {
-    return post.getByPlaceholder('Write your comment...');
+    return post.getByPlaceholder("Write your comment...");
   }
 
   private async getUniquePost(message: string): Promise<Locator> {
@@ -74,21 +87,21 @@ export class BuzzPage extends BasePage {
   }
 
   async goto() {
-    await this.gotoModule('Buzz');
+    await this.gotoModule("Buzz");
   }
 
   async addPost(message: string) {
     const composer = this.page.getByPlaceholder("What's on your mind?");
     await composer.fill(message);
-    await this.page.getByRole('button', { name: 'Post', exact: true }).click();
+    await this.page.getByRole("button", { name: "Post", exact: true }).click();
 
-    await expect(composer).toHaveValue('');
+    await expect(composer).toHaveValue("");
     await expect(this.getPost(message)).toHaveCount(1);
   }
 
   async likePost(message: string) {
     const post = await this.getUniquePost(message);
-    await post.locator('.orangehrm-heart-icon').click();
+    await post.locator(".orangehrm-heart-icon").click();
   }
 
   async commentOnPost(message: string, comment: string) {
@@ -97,7 +110,7 @@ export class BuzzPage extends BasePage {
     const input = this.getCommentInput(post);
     await expect(input).toBeVisible();
     await input.fill(comment);
-    await input.press('Enter');
+    await input.press("Enter");
     await expect(this.getComment(post, comment)).toHaveCount(1);
   }
 
@@ -106,14 +119,16 @@ export class BuzzPage extends BasePage {
     await this.ensureCommentAreaOpen(post);
     const item = this.getComment(post, comment);
     await expect(item).toHaveCount(1);
-    await this.commentAction(item, 'Like').click();
+    await this.commentAction(item, "Like").click();
   }
 
   private async openEditMode(post: Locator, comment: string): Promise<Locator> {
-    const editInput = this.getEditingComment(post).locator('input.oxd-input');
+    const editInput = this.getEditingComment(post).locator("input.oxd-input");
     await expect(async () => {
       if (!(await editInput.isVisible())) {
-        await this.commentAction(this.getComment(post, comment), 'Edit').click({ timeout: 2000 });
+        await this.commentAction(this.getComment(post, comment), "Edit").click({
+          timeout: 2000,
+        });
       }
       await expect(editInput).toBeVisible({ timeout: 2000 });
     }).toPass({ timeout: 15000 });
@@ -127,7 +142,7 @@ export class BuzzPage extends BasePage {
 
     const editInput = await this.openEditMode(post, comment);
     await editInput.fill(newComment);
-    await editInput.press('Enter');
+    await editInput.press("Enter");
 
     await expect(this.getEditingComment(post)).toHaveCount(0);
     await expect(this.getComment(post, newComment)).toHaveCount(1);
@@ -140,7 +155,7 @@ export class BuzzPage extends BasePage {
     await expect(this.getComment(post, comment)).toHaveCount(1);
 
     await this.openEditMode(post, comment);
-    await this.page.keyboard.press('Escape');
+    await this.page.keyboard.press("Escape");
 
     await expect(this.getEditingComment(post)).toHaveCount(0);
     await expect(this.getComment(post, comment)).toHaveCount(1);
@@ -151,24 +166,30 @@ export class BuzzPage extends BasePage {
     await this.ensureCommentAreaOpen(post);
     const item = this.getComment(post, comment);
     await expect(item).toHaveCount(1);
-    await this.commentAction(item, 'Delete').click();
-    await this.page.getByRole('button', { name: 'Yes, Delete' }).click();
+    await this.commentAction(item, "Delete").click();
+    await this.page.getByRole("button", { name: "Yes, Delete" }).click();
     await expect(this.getComment(post, comment)).toHaveCount(0);
   }
 
   async deletePost(message: string) {
     const post = await this.getUniquePost(message);
-    await post.locator('.oxd-icon.bi-three-dots').click();
-    await this.page.getByRole('listitem').filter({ hasText: /^Delete Post$/ }).click();
-    await this.page.getByRole('button', { name: 'Yes, Delete' }).click();
+    await post.locator(".oxd-icon.bi-three-dots").click();
+    await this.page
+      .getByRole("listitem")
+      .filter({ hasText: /^Delete Post$/ })
+      .click();
+    await this.page.getByRole("button", { name: "Yes, Delete" }).click();
     await expect(this.getPost(message)).toHaveCount(0);
   }
 
   async deletePostIfExists(message: string) {
     const appeared = await this.getPost(message)
       .first()
-      .waitFor({ state: 'attached', timeout: 5000 })
-      .then(() => true, () => false);
+      .waitFor({ state: "attached", timeout: 5000 })
+      .then(
+        () => true,
+        () => false,
+      );
     if (!appeared) return;
     await this.deletePost(message);
   }

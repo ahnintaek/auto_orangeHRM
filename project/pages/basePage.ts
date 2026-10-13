@@ -1,6 +1,10 @@
-import { Page } from '@playwright/test';
-import { expect, Locator } from '@playwright/test';
-import { getInputGroup, selectDropdown, waitForFormReady  } from '../utils/formHelpers';
+import { Page } from "@playwright/test";
+import { expect, Locator } from "@playwright/test";
+import {
+  getInputGroup,
+  selectDropdown,
+  waitForFormReady,
+} from "../utils/formHelpers";
 
 export class BasePage {
   constructor(protected readonly page: Page) {}
@@ -18,7 +22,7 @@ export class BasePage {
       await expect(input).toHaveValue(value, { timeout: 5000 });
     }
   }
-  
+
   protected async fillFields(fields: [string | RegExp, string][]) {
     for (const [label, value] of fields) {
       await this.fillAndVerify(this.getFieldInput(label), value);
@@ -30,15 +34,15 @@ export class BasePage {
   }
 
   protected getFieldInput(label: string | RegExp) {
-    return this.getInputGroup(label).locator('input');
+    return this.getInputGroup(label).locator("input");
   }
 
   protected getFieldTextArea(label: string | RegExp) {
-    return this.getInputGroup(label).locator('textarea');
+    return this.getInputGroup(label).locator("textarea");
   }
 
   protected getDateInput(label: string | RegExp) {
-    return this.getInputGroup(label).locator('.oxd-date-input input');
+    return this.getInputGroup(label).locator(".oxd-date-input input");
   }
 
   protected async selectDropdown(label: string | RegExp, value: string) {
@@ -46,32 +50,32 @@ export class BasePage {
   }
 
   protected getForm() {
-    return this.page.locator('form');
+    return this.page.locator("form");
   }
 
   protected async gotoModule(moduleName: string) {
-    await this.page.getByRole('link', { name: moduleName }).click();
+    await this.page.getByRole("link", { name: moduleName }).click();
     await this.waitForPageLoad();
   }
 
   protected async addBtn() {
-    await this.page.getByRole('button', { name: 'Add' }).click();
+    await this.page.getByRole("button", { name: "Add" }).click();
   }
 
   async save() {
     await this.getForm()
-      .getByRole('button', { name: 'Save', exact: true })
+      .getByRole("button", { name: "Save", exact: true })
       .click();
   }
 
   async getLoggedInUserName(): Promise<string> {
-    return (await this.page.locator('.oxd-userdropdown-name').innerText()).trim();
+    return (
+      await this.page.locator(".oxd-userdropdown-name").innerText()
+    ).trim();
   }
 
-
-
   async logout() {
-    await this.page.locator('.oxd-userdropdown-name').click();
-    await this.page.getByRole('menuitem', { name: 'Logout' }).click();
+    await this.page.locator(".oxd-userdropdown-name").click();
+    await this.page.getByRole("menuitem", { name: "Logout" }).click();
   }
 }
