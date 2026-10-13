@@ -1,29 +1,29 @@
-import { expect } from '@playwright/test';
-import { BasePage } from './basePage';
+import { expect } from "@playwright/test";
+import { BasePage } from "./basePage";
 import { EmployeeInfo } from "../models/employee";
-import { STATUS_ENABLED } from '../testData/seedData';
+import { STATUS_ENABLED } from "../testData/seedData";
 
 interface PersonalDetails {
   driverLicenseNumber: string;
-  licenseExpiryDate: string;   // yyyy-dd-mm
+  licenseExpiryDate: string; // yyyy-dd-mm
   nationality: string;
   maritalStatus: string;
-  dateOfBirth: string;         // yyyy-dd-mm
-  gender: 'Male' | 'Female';
+  dateOfBirth: string; // yyyy-dd-mm
+  gender: "Male" | "Female";
 }
 
 const ContactField = {
-  Street1: 'Street 1',
-  Street2: 'Street 2',
-  City: 'City',
-  StateOrProvince: 'State/Province',
-  ZipCode: 'Zip/Postal Code',
-  Country: 'Country',
-  Home: 'Home',
-  Mobile: 'Mobile',
+  Street1: "Street 1",
+  Street2: "Street 2",
+  City: "City",
+  StateOrProvince: "State/Province",
+  ZipCode: "Zip/Postal Code",
+  Country: "Country",
+  Home: "Home",
+  Mobile: "Mobile",
   Work: /^Work$/,
-  WorkEmail: 'Work Email',
-  OtherEmail: 'Other Email',
+  WorkEmail: "Work Email",
+  OtherEmail: "Other Email",
 } as const;
 
 interface ContactDetails {
@@ -43,12 +43,12 @@ interface ContactDetails {
 interface JobDetails {
   jobTitle: string;
   jobCategory: string;
-  joinedDate: string;         // yyyy-dd-mm
-};
+  joinedDate: string; // yyyy-dd-mm
+}
 
 export class PimPage extends BasePage {
   async goto() {
-    await this.gotoModule('PIM');
+    await this.gotoModule("PIM");
   }
 
   async openAddEmployeeForm() {
@@ -56,31 +56,40 @@ export class PimPage extends BasePage {
   }
 
   async uploadProfilePicture(filePath: string) {
-    const fileChooserPromise = this.page.waitForEvent('filechooser');
-    await this.page.locator('form').getByRole('img', { name: 'profile picture' }).click();
+    const fileChooserPromise = this.page.waitForEvent("filechooser");
+    await this.page
+      .locator("form")
+      .getByRole("img", { name: "profile picture" })
+      .click();
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(filePath);
   }
 
   async fillBasicInfo(employee: EmployeeInfo) {
-    await this.page.getByRole('textbox', { name: 'First Name' }).fill(employee.firstName);
-    await this.page.getByRole('textbox', { name: 'Middle Name' }).fill(employee.middleName);
-    await this.page.getByRole('textbox', { name: 'Last Name' }).fill(employee.lastName);
-    await this.getFieldInput('Employee Id').fill(employee.employeeId);
+    await this.page
+      .getByRole("textbox", { name: "First Name" })
+      .fill(employee.firstName);
+    await this.page
+      .getByRole("textbox", { name: "Middle Name" })
+      .fill(employee.middleName);
+    await this.page
+      .getByRole("textbox", { name: "Last Name" })
+      .fill(employee.lastName);
+    await this.getFieldInput("Employee Id").fill(employee.employeeId);
   }
 
-  async getEmployeeNumber(): Promise<string> {    
-    return this.getFieldInput('Employee Id').inputValue()
+  async getEmployeeNumber(): Promise<string> {
+    return this.getFieldInput("Employee Id").inputValue();
   }
 
   async enableLoginDetails() {
-    await this.page.locator('.oxd-switch-input').click();
+    await this.page.locator(".oxd-switch-input").click();
   }
 
   async fillLoginCredentials(username: string, password: string) {
-    await this.getFieldInput('Username').fill(username);
+    await this.getFieldInput("Username").fill(username);
     await this.getFieldInput(/^Password$/).fill(password);
-    await this.getFieldInput('Confirm Password').fill(password);
+    await this.getFieldInput("Confirm Password").fill(password);
   }
 
   async selectEnabledStatus() {
@@ -88,42 +97,52 @@ export class PimPage extends BasePage {
   }
 
   async saveNewEmployee() {
-    await this.page.getByRole('button', { name: 'Save' }).click();
+    await this.page.getByRole("button", { name: "Save" }).click();
   }
 
   override async save() {
     await super.save();
-    await expect(
-      this.page.getByText('Successfully Updated')
-    ).toBeVisible({ timeout: 30000 });
+    await expect(this.page.getByText("Successfully Updated")).toBeVisible({
+      timeout: 30000,
+    });
   }
 
   async fillPersonalDetails(details: PersonalDetails) {
     await this.waitForPageLoad();
-    await expect(this.page.getByRole('heading', { name: 'Personal Details' })).toBeVisible({ timeout: 30000 });
-  
+    await expect(
+      this.page.getByRole("heading", { name: "Personal Details" }),
+    ).toBeVisible({ timeout: 30000 });
+
     const driverNum = this.getFieldInput("Driver's License Number");
     await driverNum.scrollIntoViewIfNeeded();
     await this.fillAndVerify(driverNum, details.driverLicenseNumber);
-  
-    await this.fillAndVerify(this.getDateInput("License Expiry Date"), details.licenseExpiryDate);
-  
-    await this.selectDropdown('Nationality', details.nationality);
-    await this.selectDropdown('Marital Status', details.maritalStatus);
-  
-    await this.fillAndVerify(this.getDateInput("Date of Birth"), details.dateOfBirth);
-  
+
+    await this.fillAndVerify(
+      this.getDateInput("License Expiry Date"),
+      details.licenseExpiryDate,
+    );
+
+    await this.selectDropdown("Nationality", details.nationality);
+    await this.selectDropdown("Marital Status", details.maritalStatus);
+
+    await this.fillAndVerify(
+      this.getDateInput("Date of Birth"),
+      details.dateOfBirth,
+    );
+
     await this.page.getByText(details.gender, { exact: true }).click();
   }
 
   async goToContactDetails() {
     const contactDetailsResponse = this.page.waitForResponse(
-      resp => resp.url().includes('contact-details') && resp.status() === 200   // 하이픈, 실제 API
+      (resp) => resp.url().includes("contact-details") && resp.status() === 200, // 하이픈, 실제 API
     );
-    await this.page.getByRole('link', { name: 'Contact Details' }).click();
+    await this.page.getByRole("link", { name: "Contact Details" }).click();
     await contactDetailsResponse;
     await this.waitForPageLoad();
-    await expect(this.page.getByRole('heading', { name: 'Contact Details' })).toBeVisible({ timeout: 30000 });
+    await expect(
+      this.page.getByRole("heading", { name: "Contact Details" }),
+    ).toBeVisible({ timeout: 30000 });
   }
 
   async fillContactDetails(details: ContactDetails) {
@@ -143,67 +162,76 @@ export class PimPage extends BasePage {
   }
 
   async goToJobDetails(employeeNum: string) {
-    const row = this.page.locator('.oxd-table-row').filter({
+    const row = this.page.locator(".oxd-table-row").filter({
       has: this.page.locator(`div:text-is("${employeeNum}")`),
     });
     await expect(row).toHaveCount(1);
-    await row.locator('button:has(.bi-pencil-fill)').click();
+    await row.locator("button:has(.bi-pencil-fill)").click();
     await this.waitForPageLoad();
-    
+
     const jobDetailsResponse = this.page.waitForResponse(
-      resp => resp.url().includes('job-details') && resp.status() === 200   // 하이픈, 실제 API
+      (resp) => resp.url().includes("job-details") && resp.status() === 200, // 하이픈, 실제 API
     );
-    await this.page.getByRole('link', { name: 'Job' }).click();
+    await this.page.getByRole("link", { name: "Job" }).click();
     await jobDetailsResponse;
     await this.waitForPageLoad();
-    await expect(this.page.getByRole('heading', { name: 'Job Details' })).toBeVisible({ timeout: 30000 });
+    await expect(
+      this.page.getByRole("heading", { name: "Job Details" }),
+    ).toBeVisible({ timeout: 30000 });
   }
 
   async fillJobDetails(details: JobDetails) {
-    await this.fillAndVerify(this.getDateInput("Joined Date"), details.joinedDate);
+    await this.fillAndVerify(
+      this.getDateInput("Joined Date"),
+      details.joinedDate,
+    );
     await this.selectDropdown("Job Title", details.jobTitle);
     await this.selectDropdown("Job Category", details.jobCategory);
-    await this.page.getByRole('button', { name: 'Save' }).click();
-  await this.waitForPageLoad();
+    await this.page.getByRole("button", { name: "Save" }).click();
+    await this.waitForPageLoad();
   }
 
-  async searchEmployee(employeeNum:string) {
+  async searchEmployee(employeeNum: string) {
     await this.waitForPageLoad();
-    await this.getFieldInput(/^Employee Id$/).fill(employeeNum)
-    await this.page.getByRole('button', { name: 'Search' }).click();
-    await this.page.waitForSelector('.oxd-table-loader', { state: 'hidden' });
+    await this.getFieldInput(/^Employee Id$/).fill(employeeNum);
+    await this.page.getByRole("button", { name: "Search" }).click();
+    await expect(this.page.locator('.oxd-table-loader')).toBeHidden();
   }
 
   async searchEmployeeDetails(jobTitle: string) {
     await this.waitForPageLoad();
-    await this.selectDropdown('Job Title', jobTitle);
-    await this.page.getByRole('button', { name: 'Search' }).click();
-    await this.page.waitForSelector('.oxd-table-loader', { state: 'hidden' });
+    await this.selectDropdown("Job Title", jobTitle);
+    await this.page.getByRole("button", { name: "Search" }).click();
+    await expect(this.page.locator('.oxd-table-loader')).toBeHidden();
   }
 
-  async deleteEmployee(employeeNum: string) {
+  async deleteEmployee(employeeId: string) {
     await this.waitForPageLoad();
-    const row = this.page.locator('.oxd-table-row').filter({
-      has: this.page.locator(`div:text-is("${employeeNum}")`)
+    const row = this.page.locator(".oxd-table-row").filter({
+      has: this.page.locator(`div:text-is("${employeeId}")`),
     });
-  
     await expect(row).toHaveCount(1);
-  
-    await row.locator('button:has(.bi-trash)').click();
-    await this.page.getByRole('button', { name: 'Yes, Delete' }).click();
-    await expect(this.page.getByText(employeeNum)).not.toBeVisible();
+
+    await row.locator("button:has(.bi-trash)").click();
+    await this.page.getByRole("button", { name: "Yes, Delete" }).click();
+
+    await expect(this.page.getByText("Successfully Deleted")).toBeVisible();
+    await expect(row).toHaveCount(0);
   }
 
   async deleteEmployeeIfExists(employeeId: string) {
     await this.goto();
     await this.searchEmployee(employeeId);
-    const row = this.page.locator('.oxd-table-row').filter({
+    const row = this.page.locator(".oxd-table-row").filter({
       has: this.page.locator(`div:text-is("${employeeId}")`),
     });
     const exists = await row
       .first()
-      .waitFor({ state: 'attached', timeout: 5000 })
-      .then(() => true, () => false);
+      .waitFor({ state: "attached", timeout: 5000 })
+      .then(
+        () => true,
+        () => false,
+      );
     if (!exists) return;
     await this.deleteEmployee(employeeId);
   }

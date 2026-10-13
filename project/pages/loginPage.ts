@@ -1,17 +1,17 @@
-import { Page } from '@playwright/test';
-import { env } from '../utils/env';
+import { Page } from "@playwright/test";
+import { env } from "../utils/env";
 
 export class LoginPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto('/web/index.php/auth/login');
+    await this.page.goto("/web/index.php/auth/login");
   }
 
   async login(username: string, password: string) {
-    await this.page.getByRole('textbox', { name: 'Username' }).fill(username);
-    await this.page.getByRole('textbox', { name: 'Password' }).fill(password);
-    await this.page.getByRole('button', { name: 'Login' }).click();
+    await this.page.getByRole("textbox", { name: "Username" }).fill(username);
+    await this.page.getByRole("textbox", { name: "Password" }).fill(password);
+    await this.page.getByRole("button", { name: "Login" }).click();
   }
 
   async loginAsAdmin() {
@@ -20,11 +20,10 @@ export class LoginPage {
   }
 
   get invalidCredentialsError() {
-    return this.page.getByText('Invalid credentials', { exact: true });
+    return this.page.getByText("Invalid credentials", { exact: true });
   }
 
   get requiredErrors() {
-    return this.page.getByText('Required', {exact: true,});
+    return this.page.getByText("Required", { exact: true });
   }
-
 }

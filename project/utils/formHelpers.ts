@@ -1,24 +1,28 @@
-import { Page } from '@playwright/test';
+import { Page } from "@playwright/test";
 
 export function getInputGroup(page: Page, label: string | RegExp) {
-  return page.locator('.oxd-input-group').filter({
+  return page.locator(".oxd-input-group").filter({
     has: page.getByText(label, { exact: true }),
   });
 }
 
-export async function selectDropdown(page: Page, label: string | RegExp, value: string) {
+export async function selectDropdown(
+  page: Page,
+  label: string | RegExp,
+  value: string,
+) {
   const group = getInputGroup(page, label);
-  await group.locator('.oxd-select-text').click();
-  await page.getByRole('option', { name: value, exact: true }).click();
+  await group.locator(".oxd-select-text").click();
+  await page.getByRole("option", { name: value, exact: true }).click();
 }
 
 export async function waitForFormReady(page: Page) {
-  const loader = page.locator('.oxd-form-loader');
-  await loader.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {});
-  await loader.waitFor({ state: 'hidden', timeout: 10000 });
+  const loader = page.locator(".oxd-form-loader");
+  await loader.waitFor({ state: "visible", timeout: 3000 }).catch(() => {});
+  await loader.waitFor({ state: "hidden", timeout: 10000 });
 }
 
 export async function goToNextInstallerStep(page: Page) {
-  await page.getByRole('button', { name: 'Next' }).click();
-  await page.waitForLoadState('networkidle');
+  await page.getByRole("button", { name: "Next" }).click();
+  await page.waitForLoadState("networkidle");  // eslint-disable-next-line playwright/no-networkidle -- 설치 마법사 화면 개선 전까지 유지
 }
