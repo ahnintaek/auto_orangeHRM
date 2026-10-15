@@ -24,5 +24,5 @@ export async function waitForFormReady(page: Page) {
 
 export async function goToNextInstallerStep(page: Page) {
   await page.getByRole("button", { name: "Next" }).click();
-  await page.waitForLoadState("networkidle");  // eslint-disable-next-line playwright/no-networkidle -- 설치 마법사 화면 개선 전까지 유지
+  await page.waitForLoadState("networkidle");  // eslint-disable-line playwright/no-networkidle -- 설치 마법사 화면 개선 전까지 유지
 }
